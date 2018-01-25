@@ -104,10 +104,14 @@ class Grader
       test_point_values = project_point_values[file_name]
       functionality_points = test_point_values[:functionality]
       quality_points = test_point_values[:quality]
-      result = %x[./nand2tetris_tools/HardwareSimulator.sh #{test}]
+      result = %x[./nand2tetris_tools/HardwareSimulator.sh #{test} 2>&1]
       if result =~ /End of script - Comparison ended successfully/
-        puts "#{file_name} - Functionality: #{functionality_points}/#{functionality_points}; Quality: _/#{quality_points}"
+        functionality_points_awarded = functionality_points
+      else
+        functionality_points_awarded = "_"
+        output = "Output: #{result}"
       end
+      puts "*#{file_name}*\nScore: Functionality - #{functionality_points_awarded}/#{functionality_points}, Quality - _/#{quality_points}\n#{output}Notes:\n\n"
     end
     "feedback"
   end
