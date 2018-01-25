@@ -5,9 +5,7 @@ class Extractor
   end
 
   def extract_all!
-    @submissions.each do |submission|
-      unzip(submission) if submission.split(".").last == "zip"
-    end
+    @submissions.each { |submission| extract_submission(submission) }
   end
 
   def student_name(file)
@@ -15,11 +13,31 @@ class Extractor
   end
 
   def destination(file)
-    "#{@dir.path}/#{student_name(file)}".gsub(/ /, '\ ')
+    "#{@dir.path}/#{student_name(file)}"
+  end
+
+  def extract_submission(file)
+    ext = File.extname(file)
+    case ext
+    when ".zip"
+      unzip(file)
+    when ".gz"
+      untar(file, true)
+    when ".tar"
+      untar(file, false)
+    else
+      puts "unhandled ext: #{ext}"
+    end
   end
 
   def unzip(file)
-    %x[unzip #{file.gsub(/ /, '\ ')} -d #{destination(file)}]
+    %x[unzip "#{file}" -d "#{destination(file)}"]
+  end
+
+  def untar(file, gzipped)
+    Dir.mkdir(destination(file))
+    params = gzipped ? "xzf" : "xf"
+    %x[tar -#{params} "#{file}" -C "#{destination(file)}"]
   end
 end
 
