@@ -1,11 +1,14 @@
 class Extractor
   def initialize(directory)
     @dir = Dir.new(File.expand_path(directory))
-    @submissions = Dir.glob(File.join(@dir.path,"*"))
+  end
+
+  def submissions
+    Dir.glob(File.join(@dir.path,"*"))
   end
 
   def extract_all!
-    @submissions.each { |submission| extract_submission(submission) }
+    submissions.each { |submission| extract_submission(submission) }
   end
 
   def student_name(file)
@@ -39,6 +42,27 @@ class Extractor
     params = gzipped ? "xzf" : "xf"
     %x[tar -#{params} "#{file}" -C "#{destination(file)}"]
   end
+
+  def hdl_files(submission_folder)
+    Dir.glob(File.join(submission_folder, "**/*.hdl"))
+  end
+
+  def submission_folders
+    submissions.select { |x| File.directory?(x) }
+  end
 end
 
-Extractor.new(ARGV[0]).extract_all!
+class Grader
+  def initialize(extractor)
+    @extractor = extractor
+    @test_dir = Dir.new("./tests/3")
+  end
+
+  def grade(submission_folder)
+  end
+end
+
+e = Extractor.new(ARGV[0])
+g = Grader.new(e)
+# e.extract_all!
+# puts e.hdl_files(e.submission_folders.first)
