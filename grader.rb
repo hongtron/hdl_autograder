@@ -1,5 +1,3 @@
-require "pry-byebug"
-
 class Extractor
   def initialize(directory)
     @dir = Dir.new(File.expand_path(directory))
@@ -77,10 +75,12 @@ class Grader
   end
 
   def grade_all!
+    cleanup_test_dir # just in case
     @extractor.submission_folders.each { |f| grade(f) }
   end
 
   def grade(submission_folder)
+    puts "Grading #{submission_folder.split("/").last}..."
     copy_hdl_files_to_test_dir(submission_folder)
     feedback_file = File.join(submission_folder, "feedback.txt")
     File.open(feedback_file, 'w') { |file| file.write(run_tests) }
@@ -126,7 +126,7 @@ class Grader
 end
 
 e = Extractor.new(ARGV[0])
+e.extract_all!
+
 g = Grader.new(e, ARGV[1])
-g.grade(e.submission_folders.first)
-# e.extract_all!
-# puts e.hdl_files(e.submission_folders.first)
+g.grade_all!
