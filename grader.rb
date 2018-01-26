@@ -1,54 +1,38 @@
-class Extractor
-  def initialize(directory)
-    @dir = Dir.new(File.expand_path(directory))
+class Submission
+  def initialize(archive)
+    @archive = File.new(archive)
   end
 
-  def submissions
-    Dir.glob(File.join(@dir.path,"*"))
-  end
-
-  def extract_all!
-    submissions.each { |submission| extract_submission(submission) }
-  end
-
-  def student_name(file)
-    /project_3_submissions\/([a-z]+)_/.match(file).captures.first
-  end
-
-  def destination(file)
-    "#{@dir.path}/#{student_name(file)}"
-  end
-
-  def extract_submission(file)
-    ext = File.extname(file)
+  def extract!
+    ext = File.extname(@archive)
     case ext
     when ".zip"
-      unzip(file)
+      %x[unzip "#{@archive.path}" -d "#{extracted_location}"]
     when ".gz"
-      untar(file, true)
+      _untar(gzipped: true)
     when ".tar"
-      untar(file, false)
+      _untar(gzipped: false)
     else
       puts "unhandled ext: #{ext}"
     end
   end
 
-  def unzip(file)
-    %x[unzip "#{file}" -d "#{destination(file)}"]
-  end
-
-  def untar(file, gzipped)
-    Dir.mkdir(destination(file))
+  def _untar(gzipped: true)
+    Dir.mkdir(extracted_location)
     params = gzipped ? "xzf" : "xf"
-    %x[tar -#{params} "#{file}" -C "#{destination(file)}"]
+    %x[tar -#{params} "#{@archive.path}" -C "#{extracted_location}"]
   end
 
-  def hdl_files(submission_folder)
-    Dir.glob(File.join(submission_folder, "**/*.hdl"))
+  def extracted_location
+    File.join(File.dirname(@archive), student_name)
   end
 
-  def submission_folders
-    submissions.select { |x| File.directory?(x) }
+  def student_name
+    /project_3_submissions\/([a-z]+)_/.match(@archive.path).captures.first
+  end
+
+  def hdl_files
+    Dir.glob(File.join(extracted_location, "**/*.hdl"))
   end
 end
 
@@ -68,31 +52,22 @@ class Grader
     }
   }
 
-  def initialize(extractor, project_number)
-    @extractor = extractor
+  def initialize(project_number)
     @project_number = project_number
     @test_dir = Dir.new("./tests/#{project_number}")
   end
 
-  def grade_all!
+  def grade(submission)
     cleanup_test_dir # just in case
-    @extractor.submission_folders.each { |f| grade(f) }
-  end
-
-  def grade(submission_folder)
-    puts "Grading #{submission_folder.split("/").last}..."
-    copy_hdl_files_to_test_dir(submission_folder)
-    feedback_file = File.join(submission_folder, "feedback.txt")
+    puts "Grading #{submission.student_name}..."
+    copy_hdl_files_to_test_dir(submission)
+    feedback_file = File.join(submission.extracted_location, "feedback.txt")
     File.open(feedback_file, 'w') { |file| file.write(run_tests) }
     cleanup_test_dir
   end
 
-  def copy_hdl_files_to_test_dir(source)
-    @extractor.hdl_files(source).each { |hdl| FileUtils.copy(hdl, @test_dir.path) }
-  end
-
-  def test_dir_files
-    Dir.glob(File.join(@test_dir.path,"*"))
+  def copy_hdl_files_to_test_dir(submission)
+    submission.hdl_files.each { |f| FileUtils.copy(f, @test_dir.path) }
   end
 
   def run_tests
@@ -116,17 +91,23 @@ class Grader
     feedback.join
   end
 
-  def test_files
-    Dir.glob(File.join(@test_dir.path, "**/*.tst"))
-  end
-
   def cleanup_test_dir
     test_dir_files.select { |f| [".hdl", ".out"].include?(File.extname(f)) }.each { |f| File.delete(f) }
   end
+
+  def test_dir_files
+    Dir.glob(File.join(@test_dir.path,"*"))
+  end
+
+  def test_files
+    Dir.glob(File.join(@test_dir.path, "**/*.tst"))
+  end
 end
 
-e = Extractor.new(ARGV[0])
-e.extract_all!
+submissions = Dir.glob(File.join(ARGV[0], "*")).map { |archive| Submission.new(archive) }
+g = Grader.new(ARGV[1])
 
-g = Grader.new(e, ARGV[1])
-g.grade_all!
+submissions.each do |s|
+  s.extract!
+  g.grade(s)
+end
