@@ -111,9 +111,9 @@ class Grader
         functionality_points_awarded = "_"
         output = "Output: #{result}"
       end
-      puts "*#{file_name}*\nScore: Functionality - #{functionality_points_awarded}/#{functionality_points}, Quality - _/#{quality_points}\n#{output}Notes:\n\n"
+      feedback << "*#{file_name}*\nScore: Functionality - #{functionality_points_awarded}/#{functionality_points}, Quality - _/#{quality_points}\n#{output}Notes:\n\n"
     end
-    "feedback"
+    feedback.join
   end
 
   def test_files
