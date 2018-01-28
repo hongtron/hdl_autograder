@@ -79,16 +79,26 @@ class Grader
       test_point_values = project_point_values[file_name]
       functionality_points = test_point_values[:functionality]
       quality_points = test_point_values[:quality]
-      result = %x[./nand2tetris_tools/HardwareSimulator.sh #{test} 2>&1]
-      if result =~ /End of script - Comparison ended successfully/
-        functionality_points_awarded = functionality_points
+
+      # need to check, otherwise the simulator will use the built in chip and pass
+      if chip_implemented?(test)
+        result = %x[./nand2tetris_tools/HardwareSimulator.sh #{test} 2>&1]
+        if result =~ /End of script - Comparison ended successfully/
+          functionality_points_awarded = functionality_points
+        else
+          functionality_points_awarded = "_"
+          output = "Output: #{result}"
+        end
       else
-        functionality_points_awarded = "_"
-        output = "Output: #{result}"
+        functionality_points_awarded = 0
       end
       feedback << "*#{file_name}*\nScore: Functionality - #{functionality_points_awarded}/#{functionality_points}, Quality - _/#{quality_points}\n#{output}Notes:\n\n"
     end
     feedback.join
+  end
+
+  def chip_implemented?(test_file)
+    File.exist?(test_file.gsub(/tst/, "hdl"))
   end
 
   def cleanup_test_dir
