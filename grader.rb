@@ -28,7 +28,7 @@ class Submission
   end
 
   def student_name
-    /project_3_submissions\/([a-z]+)_/.match(@archive.path).captures.first
+    /project_2_submissions\/([a-z]+)_/.match(@archive.path).captures.first
   end
 
   def hdl_files
@@ -40,6 +40,13 @@ class Grader
   require 'fileutils'
 
   POINT_VALUES = {
+    "2" => {
+      "HalfAdder" => {:functionality => 6, :quality => 3},
+      "FullAdder" => {:functionality => 8, :quality => 4},
+      "Add16" => {:functionality => 8, :quality => 4},
+      "Inc16" => {:functionality => 10, :quality => 5},
+      "ALU" => {:functionality => 35, :quality => 17},
+    },
     "3" => {
       "Bit" => {:functionality => 7, :quality => 3},
       "Register" => {:functionality => 7, :quality => 3},
@@ -49,7 +56,7 @@ class Grader
       "RAM4K" => {:functionality => 5, :quality => 3},
       "RAM16K" => {:functionality => 5, :quality => 3},
       "PC" => {:functionality => 12, :quality => 6},
-    }
+    },
   }
 
   def initialize(project_number)
