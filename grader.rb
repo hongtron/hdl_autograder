@@ -38,26 +38,7 @@ end
 
 class Grader
   require 'fileutils'
-
-  POINT_VALUES = {
-    "2" => {
-      "HalfAdder" => {:functionality => 6, :quality => 3},
-      "FullAdder" => {:functionality => 8, :quality => 4},
-      "Add16" => {:functionality => 8, :quality => 4},
-      "Inc16" => {:functionality => 10, :quality => 5},
-      "ALU" => {:functionality => 35, :quality => 17},
-    },
-    "3" => {
-      "Bit" => {:functionality => 7, :quality => 3},
-      "Register" => {:functionality => 7, :quality => 3},
-      "RAM8" => {:functionality => 13, :quality => 6},
-      "RAM64" => {:functionality => 13, :quality => 6},
-      "RAM512" => {:functionality => 5, :quality => 3},
-      "RAM4K" => {:functionality => 5, :quality => 3},
-      "RAM16K" => {:functionality => 5, :quality => 3},
-      "PC" => {:functionality => 12, :quality => 6},
-    },
-  }
+	require_relative 'rubrics'
 
   def initialize(project_number)
     @project_number = project_number
@@ -68,7 +49,7 @@ class Grader
     cleanup_test_dir # just in case
     puts "Grading #{submission.student_name}..."
     copy_hdl_files_to_test_dir(submission)
-    feedback_file = File.join(submission.extracted_location, "feedback.txt")
+    feedback_file = File.join(submission.extracted_location, "#{submission.student_name}_feedback.txt")
     File.open(feedback_file, 'w') { |file| file.write(run_tests) }
     cleanup_test_dir
   end
@@ -78,34 +59,64 @@ class Grader
   end
 
   def run_tests
-    feedback = []
-    project_point_values = POINT_VALUES[@project_number]
+    feedback = [FEEDBACK_TEMPLATES[@project_number]]
+    project_point_values = RUBRICS[@project_number]
+    total_points = 0
 
     test_files.each do |test|
       file_name = File.basename(test, ".tst")
       test_point_values = project_point_values[file_name]
       functionality_points = test_point_values[:functionality]
       quality_points = test_point_values[:quality]
+      optimal_part_count = test_point_values[:optimal_part_count]
 
       # need to check, otherwise the simulator will use the built in chip and pass
       if chip_implemented?(test)
         result = %x[./nand2tetris_tools/HardwareSimulator.sh #{test} 2>&1]
         if result =~ /End of script - Comparison ended successfully/
           functionality_points_awarded = functionality_points
+          quality_deductions = number_of_parts_used(test) - optimal_part_count
+          quality_points_awarded = quality_points - quality_deductions
+          quality_points_awarded = 0 if quality_points_awarded < 0
         else
           functionality_points_awarded = "_"
-          output = "Output: #{result}"
+          quality_points_awarded = "_"
         end
       else
         functionality_points_awarded = 0
+        quality_points_awarded = 0
       end
-      feedback << "*#{file_name}*\nScore: Functionality - #{functionality_points_awarded}/#{functionality_points}, Quality - _/#{quality_points}\n#{output}Notes:\n\n"
+
+      total_points += functionality_points_awarded + quality_points_awarded unless [functionality_points_awarded, quality_points_awarded].include?("_")
+      chip_feedback = []
+      functionality_score = "#{functionality_points_awarded}/#{functionality_points}"
+      quality_score = "#{quality_points_awarded}/#{quality_points}"
+      comments = "#{number_of_parts_used(test)} parts used; #{optimal_part_count} is optimal" if chip_implemented?(test)
+      chip_feedback = [file_name, functionality_score, quality_score, comments].map { |x| x.ljust(20) }.join
+      feedback << chip_feedback
     end
-    feedback.join
+    feedback << "Total points: #{total_points}"
+    feedback.join("\n")
   end
 
   def chip_implemented?(test_file)
-    File.exist?(test_file.gsub(/tst/, "hdl"))
+    File.exist?(implementation(test_file))
+  end
+
+  def implementation(test_file)
+    test_file.gsub(/tst/, "hdl")
+  end
+
+  def number_of_parts_used(test_file)
+    File.read(implementation(test_file))
+      .split("\r\n")
+      .map(&:strip)
+      .select { |line| line.start_with?(*built_in_chips) }.length
+  end
+
+  def built_in_chips
+    Dir.glob(File.join(Dir.pwd, "nand2tetris_tools/builtInChips/*.hdl"))
+      .map { |c| File.basename(c, ".hdl") }
   end
 
   def cleanup_test_dir
