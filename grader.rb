@@ -72,7 +72,6 @@ class Grader
       chip_functionality[chip] = test_passes?(test) if chip_functionality[chip]
     end
 
-    require "pry-byebug"; binding.pry
     chip_functionality.each do |chip, passed|
       functionality_grades[chip] = passed ? project_point_values[chip][:functionality] : "_"
     end
@@ -87,7 +86,7 @@ class Grader
       end
     end
 
-    "generate feedback output"
+    "#{functionality_grades.inspect}#{quality_grades.inspect}\n"
   end
 
   def test_passes?(test_file)
