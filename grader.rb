@@ -68,21 +68,22 @@ class Grader
     chip_functionality = Hash.new { |h, k| h[k] = true }
 
     test_files.each do |test|
-      file_name = File.basename(test, ".tst")
-      chip_functionality[file_name] = test_passes?(test) if chip_functionality[file_name]
+      chip = File.basename(implementation(test), ".hdl")
+      chip_functionality[chip] = test_passes?(test) if chip_functionality[chip]
     end
 
+    require "pry-byebug"; binding.pry
     chip_functionality.each do |chip, passed|
       functionality_grades[chip] = passed ? project_point_values[chip][:functionality] : "_"
     end
 
     test_files.each do |test|
-      file_name = File.basename(test, ".tst")
-      test_point_values = project_point_values[file_name]
-      if chip_functionality[file_name]
-        quality_grades[file_name] = _quality_points(test, test_point_values)
+      chip = File.basename(implementation(test), ".hdl")
+      test_point_values = project_point_values[chip]
+      if chip_functionality[chip]
+        quality_grades[chip] = _quality_points(test, test_point_values)
       else
-        quality_grades[file_name] = "_"
+        quality_grades[chip] = "_"
       end
     end
 
