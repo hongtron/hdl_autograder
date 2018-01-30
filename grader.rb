@@ -28,7 +28,7 @@ class Submission
   end
 
   def student_name
-    /project_2_submissions\/([a-z]+)_/.match(@archive.path).captures.first
+    /project_2_retries\/([a-z]+)_/.match(@archive.path).captures.first
   end
 
   def hdl_files
@@ -39,6 +39,7 @@ end
 class Grader
   require 'fileutils'
 	require_relative 'rubrics'
+  ChipFeedback = Struct.new(:chip, :functionality_points, :quality_points, :comment)
 
   def initialize(project_number)
     @project_number = project_number
@@ -59,44 +60,49 @@ class Grader
   end
 
   def run_tests
-    feedback = [FEEDBACK_TEMPLATES[@project_number]]
     project_point_values = RUBRICS[@project_number]
-    total_points = 0
+    functionality_grades = {}
+    quality_grades = {}
+    chip_functionality = Hash.new { |h, k| h[k] = true }
+
+    test_files.each do |test|
+      file_name = File.basename(test, ".tst")
+      chip_functionality[file_name] = test_passes?(test) if chip_functionality[file_name]
+    end
+
+    chip_functionality.each do |chip, passed|
+      functionality_grades[chip] = passed ? project_point_values[chip][:functionality] : "_"
+    end
 
     test_files.each do |test|
       file_name = File.basename(test, ".tst")
       test_point_values = project_point_values[file_name]
-      functionality_points = test_point_values[:functionality]
-      quality_points = test_point_values[:quality]
-      optimal_part_count = test_point_values[:optimal_part_count]
-
-      # need to check, otherwise the simulator will use the built in chip and pass
-      if chip_implemented?(test)
-        result = %x[./nand2tetris_tools/HardwareSimulator.sh #{test} 2>&1]
-        if result =~ /End of script - Comparison ended successfully/
-          functionality_points_awarded = functionality_points
-          quality_deductions = number_of_parts_used(test) - optimal_part_count
-          quality_points_awarded = quality_points - quality_deductions
-          quality_points_awarded = 0 if quality_points_awarded < 0
-        else
-          functionality_points_awarded = "_"
-          quality_points_awarded = "_"
-        end
+      if chip_functionality[file_name]
+        quality_grades[file_name] = _quality_points(test, test_point_values)
       else
-        functionality_points_awarded = 0
-        quality_points_awarded = 0
+        quality_grades[file_name] = "_"
       end
-
-      total_points += functionality_points_awarded + quality_points_awarded unless [functionality_points_awarded, quality_points_awarded].include?("_")
-      chip_feedback = []
-      functionality_score = "#{functionality_points_awarded}/#{functionality_points}"
-      quality_score = "#{quality_points_awarded}/#{quality_points}"
-      comments = "#{number_of_parts_used(test)} parts used; #{optimal_part_count} is optimal" if chip_implemented?(test)
-      chip_feedback = [file_name, functionality_score, quality_score, comments].map { |x| x.ljust(20) }.join
-      feedback << chip_feedback
     end
-    feedback << "Total points: #{total_points}"
-    feedback.join("\n")
+
+    "generate feedback output"
+  end
+
+  def test_passes?(test_file)
+    return false unless chip_implemented?(test_file)
+
+    result = %x[./nand2tetris_tools/HardwareSimulator.sh #{test_file} 2>&1]
+    result =~ /End of script - Comparison ended successfully/
+  end
+
+  def _quality_points(test, test_point_values)
+    quality_points = test_point_values[:quality]
+    optimal_part_count = test_point_values[:optimal_part_count]
+    comments = "#{number_of_parts_used(test)} parts used; #{optimal_part_count} is optimal" if chip_implemented?(test)
+    quality_deductions = number_of_parts_used(test) - optimal_part_count
+    quality_points_awarded = quality_points - quality_deductions
+    quality_points_awarded = 0 if quality_points_awarded < 0
+
+    quality_points_awarded
   end
 
   def chip_implemented?(test_file)
@@ -104,7 +110,9 @@ class Grader
   end
 
   def implementation(test_file)
-    test_file.gsub(/tst/, "hdl")
+    test_file
+      .gsub(/tst/, "hdl")
+      .gsub(/Computer([A-Za-z]+\.hdl)/, "Computer.hdl")
   end
 
   def number_of_parts_used(test_file)
