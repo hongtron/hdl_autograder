@@ -16,6 +16,11 @@
       "RAM16K" => {:functionality => 5, :quality => 3},
       "PC" => {:functionality => 12, :quality => 6},
     },
+    "5" => {
+      "Memory" => {:functionality => 17, :quality => 8},
+      "CPU" => {:functionality => 35, :quality => 18},
+      "Computer" => {:functionality => 15, :quality => 7},
+    },
   }
 
 FEEDBACK_TEMPLATES = {
