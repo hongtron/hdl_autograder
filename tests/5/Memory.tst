@@ -10,6 +10,7 @@ output-list in%D1.6.1 load%B2.1.2 address%B1.15.1 out%D1.6.1;
 
 echo "Before you run this script, select the 'Screen' option from the 'View' menu";
 
+set Keyboard[] 0,
 set in -1,				// Set RAM[0] = -1
 set load 1,
 set address 0,
@@ -79,7 +80,7 @@ tock,
 output;
 
 set load 0,
-set address %X2234,		// Did not also write to upper RAM or Screen 
+set address %X2234,		// Did not also write to upper RAM or Screen
 eval, output;
 set address %X6234,
 eval, output;
@@ -93,7 +94,7 @@ tock,
 output;
 
 set load 0,
-set address %X0345,		// Did not also write to lower RAM or Screen 
+set address %X0345,		// Did not also write to lower RAM or Screen
 eval, output;
 set address %X4345,
 eval, output;
@@ -105,17 +106,32 @@ echo "Click the Keyboard icon and hold down the 'K' key (uppercase) until you se
 // It's important to keep holding the key down since if the system is busy,
 // the memory will zero itself before being outputted.
 
+set Keyboard[] 75;
+
 while out <> 75 {
     eval,
 }
 
 clear-echo,
-output;
+output;				// checks KB input value
+set Keyboard[] 0;
 
 // Screen test
 
 set load 1,
 set in -1,
+set address %X4FCF,
+tick,
+tock,
+output,
+
+set address %X504F,
+tick,
+tock,
+output;
+
+set in 9999,			// Screen holds value
+set load 0,
 set address %X4FCF,
 tick,
 tock,
@@ -151,6 +167,7 @@ set address %X5FCF, eval, output;
 
 set load 0,
 set address 24576,
+set Keyboard[] 89;
 echo "Make sure you see ONLY two horizontal lines in the middle of the screen. Hold down 'Y' (uppercase) until you see the next message ...",
 // It's important to keep holding the key down since if the system is busy,
 // the memory will zero itself before being outputted.
@@ -160,4 +177,5 @@ while out <> 89 {
 }
 
 clear-echo,
-output;
+output;				// checks KB input value
+set Keyboard[] 0;
