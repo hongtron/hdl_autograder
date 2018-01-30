@@ -28,7 +28,7 @@ class Submission
   end
 
   def student_name
-    /project_2_retries\/([a-z]+)_/.match(@archive.path).captures.first
+    /project_5_submissions\/([a-z]+)_/.match(@archive.path).captures.first
   end
 
   def hdl_files
@@ -60,6 +60,8 @@ class Grader
   end
 
   def run_tests
+    # memory test help
+    # http://nand2tetris-questions-and-answers-forum.32033.n3.nabble.com/Adjusting-command-line-execution-for-all-the-tests-td4029923.html
     project_point_values = RUBRICS[@project_number]
     functionality_grades = {}
     quality_grades = {}
