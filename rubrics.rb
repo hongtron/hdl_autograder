@@ -17,9 +17,9 @@
       "PC" => {:functionality => 12, :quality => 6},
     },
     "5" => {
-      "Memory" => {:functionality => 17, :quality => 8},
-      "CPU" => {:functionality => 35, :quality => 18},
-      "Computer" => {:functionality => 15, :quality => 7},
+      "Memory" => {:functionality => 17, :quality => 8, :optimal_part_count => 5},
+      "CPU" => {:functionality => 35, :quality => 18, :optimal_part_count => 19},
+      "Computer" => {:functionality => 15, :quality => 7, :optimal_part_count => 3},
     },
   }
 
