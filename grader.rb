@@ -39,7 +39,6 @@ end
 class Grader
   require 'fileutils'
 	require_relative 'rubrics'
-  ChipFeedback = Struct.new(:chip, :functionality_points, :quality_points, :comment)
 
   def initialize(project_number)
     @project_number = project_number
@@ -60,68 +59,40 @@ class Grader
   end
 
   def run_tests
-    # memory test help
-    # http://nand2tetris-questions-and-answers-forum.32033.n3.nabble.com/Adjusting-command-line-execution-for-all-the-tests-td4029923.html
     project_point_values = RUBRICS[@project_number]
     functionality_grades = {}
     quality_grades = {}
     chip_functionality = Hash.new { |h, k| h[k] = true }
 
-    test_files.each do |test|
-      chip = File.basename(implementation(test), ".hdl")
-      chip_functionality[chip] = test_passes?(test) if chip_functionality[chip]
+    tests.each do |test|
+      chip_functionality[test.chip_name] = test.run! if chip_functionality[test.chip_name]
     end
 
     chip_functionality.each do |chip, passed|
       functionality_grades[chip] = passed ? project_point_values[chip][:functionality] : "_"
     end
 
-    test_files.each do |test|
-      chip = File.basename(implementation(test), ".hdl")
-      test_point_values = project_point_values[chip]
-      if chip_functionality[chip]
-        quality_grades[chip] = _quality_points(test, test_point_values)
+    tests.each do |test|
+      test_point_values = project_point_values[test.chip_name]
+      quality_points = test_point_values[:quality]
+      optimal_part_count = test_point_values[:optimal_part_count]
+      if chip_functionality[test.chip_name]
+        quality_grades[test.chip_name] = _quality_points(test, quality_points, optimal_part_count)
       else
-        quality_grades[chip] = "_"
+        quality_grades[test.chip_name] = "_"
       end
     end
 
     "#{functionality_grades.inspect}#{quality_grades.inspect}\n"
   end
 
-  def test_passes?(test_file)
-    return false unless chip_implemented?(test_file)
-
-    result = %x[./nand2tetris_tools/HardwareSimulator.sh #{test_file} 2>&1]
-    result =~ /End of script - Comparison ended successfully/
-  end
-
-  def _quality_points(test, test_point_values)
-    quality_points = test_point_values[:quality]
-    optimal_part_count = test_point_values[:optimal_part_count]
-    comments = "#{number_of_parts_used(test)} parts used; #{optimal_part_count} is optimal" if chip_implemented?(test)
-    quality_deductions = number_of_parts_used(test) - optimal_part_count
+  def _quality_points(test, quality_points, optimal_part_count)
+    comments = "#{test.number_of_parts_used(built_in_chips)} parts used; #{optimal_part_count} is optimal" if test.chip_implemented?
+    quality_deductions = test.number_of_parts_used(built_in_chips) - optimal_part_count
     quality_points_awarded = quality_points - quality_deductions
     quality_points_awarded = 0 if quality_points_awarded < 0
 
     quality_points_awarded
-  end
-
-  def chip_implemented?(test_file)
-    File.exist?(implementation(test_file))
-  end
-
-  def implementation(test_file)
-    test_file
-      .gsub(/tst/, "hdl")
-      .gsub(/Computer([A-Za-z]+\.hdl)/, "Computer.hdl")
-  end
-
-  def number_of_parts_used(test_file)
-    File.read(implementation(test_file))
-      .split("\r\n")
-      .map(&:strip)
-      .select { |line| line.start_with?(*built_in_chips) }.length
   end
 
   def built_in_chips
@@ -137,8 +108,44 @@ class Grader
     Dir.glob(File.join(@test_dir.path,"*"))
   end
 
-  def test_files
+  def tests
     Dir.glob(File.join(@test_dir.path, "**/*.tst"))
+      .map { |t| Test.new(t) }
+  end
+end
+
+class Test
+  def initialize(test_file)
+    @tst = test_file
+  end
+
+  def hdl
+    @tst
+      .gsub(/tst/, "hdl")
+      .gsub(/Computer([A-Za-z]+\.hdl)/, "Computer.hdl")
+  end
+
+  def chip_name
+    File.basename(hdl, ".hdl")
+  end
+
+  def chip_implemented?
+    File.exist?(hdl)
+  end
+
+  def run!
+    return false unless chip_implemented?
+    result = %x[./nand2tetris_tools/HardwareSimulator.sh #{@tst} 2>&1]
+    result =~ /End of script - Comparison ended successfully/
+  end
+
+
+  def number_of_parts_used(built_in_chips)
+    File.read(hdl)
+      .split("\r\n")
+      .map(&:strip)
+      .select { |line| line.start_with?(*built_in_chips) }
+      .length
   end
 end
 
