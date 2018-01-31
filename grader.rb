@@ -28,7 +28,7 @@ class Submission
   end
 
   def student_name
-    /project_5_submissions\/([a-z]+)_/.match(@archive.path).captures.first
+    /extracted\/([a-z]+)_/.match(@archive.path).captures.first
   end
 
   def hdl_files
@@ -149,8 +149,13 @@ class Test
   end
 end
 
-submissions = Dir.glob(File.join(ARGV[0], "*")).map { |archive| Submission.new(archive) }
-g = Grader.new(ARGV[1])
+submission_archive = File.expand_path(ARGV[0])
+project_number = ARGV[1]
+submission_dir = File.join(File.dirname(submission_archive), "extracted")
+
+%x[unzip "#{submission_archive}" -d "#{submission_dir}"]
+submissions = Dir.glob(File.join(submission_dir, "*")).map { |archive| Submission.new(archive) }
+g = Grader.new(project_number)
 
 submissions.each do |s|
   s.extract!
