@@ -20,7 +20,7 @@ module HdlAutograder
 
     def run!
       return false unless chip_implemented?
-      result = %x[./nand2tetris_tools/HardwareSimulator.sh #{@tst} 2>&1]
+      result = %x[./bin/nand2tetris_tools/HardwareSimulator.sh #{@tst} 2>&1]
       result =~ /End of script - Comparison ended successfully/
     end
 

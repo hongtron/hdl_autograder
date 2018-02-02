@@ -84,7 +84,7 @@ module HdlAutograder
     end
 
     def _built_in_chips
-      Dir.glob(File.join(Dir.pwd, "nand2tetris_tools/builtInChips/*.hdl"))
+      Dir.glob(File.join(Dir.pwd, "bin", "nand2tetris_tools", "builtInChips", "*.hdl"))
         .map { |c| File.basename(c, ".hdl") }
     end
 
