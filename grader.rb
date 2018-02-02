@@ -83,19 +83,44 @@ class Grader
       end
     end
 
-    "#{functionality_grades.inspect}#{quality_grades.inspect}\n"
+    build_feedback(project_point_values, functionality_grades, quality_grades)
+  end
+
+  def build_feedback(project_point_values, functionality_grades, quality_grades)
+    chips = functionality_grades.keys
+    raise unless functionality_grades.keys & quality_grades.keys == chips
+
+    total_points = 0
+    feedback = [] << FEEDBACK_TEMPLATES[@project_number]
+
+    chips.each do |c|
+      functionality_points = functionality_grades[c]
+      quality_points = quality_grades[c][0]
+      comments = quality_grades[c][1]
+
+      total_points += functionality_points + quality_points unless functionality_points == "_"
+      functionality_score = "#{functionality_points}/#{project_point_values[c][:functionality]}"
+      quality_score = "#{quality_points}/#{project_point_values[c][:quality]}"
+
+      feedback << [c, functionality_score, quality_score, comments].compact.map { |x| x.ljust(20) }.join
+    end
+
+    feedback << "Total points: #{total_points}"
+    feedback.join("\n")
   end
 
   def _quality_points(test, quality_points, optimal_part_count)
-    comments = "#{test.number_of_parts_used(built_in_chips)} parts used; #{optimal_part_count} is optimal" if test.chip_implemented?
-    quality_deductions = test.number_of_parts_used(built_in_chips) - optimal_part_count
+    chipset = _built_in_chips
+    chipset += ["CPU", "Memory"] if @project_number == "5"
+    comments = "#{test.number_of_parts_used(chipset)} parts used; #{optimal_part_count} is optimal" if test.chip_implemented?
+    quality_deductions = test.number_of_parts_used(chipset) - optimal_part_count
     quality_points_awarded = quality_points - quality_deductions
     quality_points_awarded = 0 if quality_points_awarded < 0
 
-    quality_points_awarded
+    [quality_points_awarded, comments]
   end
 
-  def built_in_chips
+  def _built_in_chips
     Dir.glob(File.join(Dir.pwd, "nand2tetris_tools/builtInChips/*.hdl"))
       .map { |c| File.basename(c, ".hdl") }
   end
@@ -140,11 +165,11 @@ class Test
   end
 
 
-  def number_of_parts_used(built_in_chips)
+  def number_of_parts_used(chipset)
     File.read(hdl)
       .split("\r\n")
       .map(&:strip)
-      .select { |line| line.start_with?(*built_in_chips) }
+      .select { |line| line.start_with?(*chipset) }
       .length
   end
 end
@@ -154,7 +179,9 @@ project_number = ARGV[1]
 submission_dir = File.join(File.dirname(submission_archive), "extracted")
 
 %x[unzip "#{submission_archive}" -d "#{submission_dir}"]
-submissions = Dir.glob(File.join(submission_dir, "*")).map { |archive| Submission.new(archive) }
+submissions = Dir.glob(File.join(submission_dir, "*"))
+  .reject { |s| s =~ /__MACOSX/ }
+  .map { |archive| Submission.new(archive) }
 g = Grader.new(project_number)
 
 submissions.each do |s|
