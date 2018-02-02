@@ -18,13 +18,14 @@
     },
     "5" => {
       "Memory" => {:functionality => 17, :quality => 8, :optimal_part_count => 5},
-      "CPU" => {:functionality => 35, :quality => 18, :optimal_part_count => 19},
+      "CPU" => {:functionality => 35, :quality => 18, :optimal_part_count => 18},
       "Computer" => {:functionality => 15, :quality => 7, :optimal_part_count => 3},
     },
   }
 
-FEEDBACK_TEMPLATES = {
-  "2" => <<~proj2
+FEEDBACK_TEMPLATES = {}
+
+FEEDBACK_TEMPLATES["2"] = <<~proj2
         Intro to Computer Systems :: Project 2 :: Combinational Chips
 
         Grading method: The implementation of some chips was described in the
@@ -38,4 +39,18 @@ FEEDBACK_TEMPLATES = {
 
         Chip                Working?            Well built?         Comments
   proj2
-}
+
+FEEDBACK_TEMPLATES["5"] = <<~proj5
+        Intro to Computer Systems :: Project 5 :: Computer Architecture
+
+        Grading method: The implementation of some chips was described in the
+        book, and some chips are simpler than others. The different weights
+        assigned to the chips below reflect this variance.  If the chip passes
+        all the tests specified in the supplied test script, it receives two
+        thirds of its allotted points. The remaining third reflects our
+        evaluation of the way the chip is built (we generally prefer
+        implementations that use as few parts as possible, since additional
+        parts can tax performance and be cost-ineffective).
+
+        Chip                Working?            Well built?         Comments
+  proj5
