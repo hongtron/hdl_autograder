@@ -1,8 +1,5 @@
 module HdlAutograder
   class Grader
-    require 'fileutils'
-    require_relative 'rubrics'
-
     def initialize(project_number)
       @project_number = project_number
       @test_dir = Dir.new("./resources/hdl_tests/#{project_number}")
