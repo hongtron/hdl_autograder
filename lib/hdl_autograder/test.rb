@@ -18,13 +18,6 @@ module HdlAutograder
       File.exist?(hdl)
     end
 
-    def run!
-      return false unless chip_implemented?
-      result = %x[./bin/nand2tetris_tools/HardwareSimulator.sh #{@tst} 2>&1]
-      result =~ /End of script - Comparison ended successfully/
-    end
-
-
     def number_of_parts_used(chipset)
       File.read(hdl)
         .split("\r\n")
