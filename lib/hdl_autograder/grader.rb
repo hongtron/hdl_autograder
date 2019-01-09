@@ -5,28 +5,22 @@ module HdlAutograder
       @test_dir = Dir.new("./resources/hdl_tests/#{project_number}")
     end
 
+    def simulator
+      @_simulator ||= Simulator.new(self)
+    end
+
     def grade(submission)
-      cleanup_test_dir # just in case
       puts "Grading #{submission.student_name}..."
-      copy_hdl_files_to_test_dir(submission)
       feedback_file = File.join(submission.extracted_location, "#{submission.student_name}_feedback.txt")
-      File.open(feedback_file, 'w') { |file| file.write(run_tests) }
-      cleanup_test_dir
+      File.open(feedback_file, 'w') { |file| file.write(run_tests(submission)) }
     end
 
-    def copy_hdl_files_to_test_dir(submission)
-      submission.hdl_files.each { |f| FileUtils.copy(f, @test_dir.path) }
-    end
-
-    def run_tests
+    def run_tests(submission)
       project_point_values = RUBRICS[@project_number]
       functionality_grades = {}
       quality_grades = {}
-      chip_functionality = Hash.new { |h, k| h[k] = true }
 
-      tests.each do |test|
-        chip_functionality[test.chip_name] = test.run! if chip_functionality[test.chip_name]
-      end
+      chip_functionality = simulator.run(submission.hdl_files)
 
       chip_functionality.each do |chip, passed|
         functionality_grades[chip] = passed ? project_point_values[chip][:functionality] : "_"
@@ -83,14 +77,6 @@ module HdlAutograder
     def _built_in_chips
       Dir.glob(File.join(Dir.pwd, "bin", "nand2tetris_tools", "builtInChips", "*.hdl"))
         .map { |c| File.basename(c, ".hdl") }
-    end
-
-    def cleanup_test_dir
-      test_dir_files.select { |f| [".hdl", ".out"].include?(File.extname(f)) }.each { |f| File.delete(f) }
-    end
-
-    def test_dir_files
-      Dir.glob(File.join(@test_dir.path,"*"))
     end
 
     def tests

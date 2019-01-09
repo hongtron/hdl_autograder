@@ -1,23 +1,37 @@
 module HdlAutograder
   class Simulator
-    def self.run(test)
+    def initialize(grader)
+      @grader = grader
+    end
+
+    def tst_files(tmp)
+      Dir.glob(File.join(tmp, "**/*.tst"))
+    end
+
+    def test_dir
+      @_test_dir ||= Dir.new("./resources/hdl_tests/#{@grader.project_number}")
+    end
+
+    def test_resources
+      Dir.glob(File.join(test_dir.path, "**/*.{cmp,tst}"))
+    end
+
+    def setup(hdl_files, tmp)
+      FileUtils.copy_entry("bin/nand2tetris_tools/builtInChips", tmp)
+      (hdl_files + test_resources).each { |f| FileUtils.copy(f, tmp) }
+    end
+
+    def run(hdl_files)
+      results = {}
       Dir.mktmpdir do |tmp|
-        implementation = test
-          .gsub(/tst/, "hdl")
-          .gsub(/Computer([A-Za-z]+\.hdl)/, "Computer.hdl")
-
-        comparison = test
-          .gsub(/tst/, "cmp")
-
-        FileUtils.copy_entry("bin/nand2tetris_tools/builtInChips", tmp)
-        FileUtils.copy(implementation, tmp)
-        FileUtils.copy(comparison, tmp)
-        FileUtils.copy(test, tmp)
-
-        tmp_test = File.join(tmp, File.basename(test))
-
-        %x[java -classpath "#{java_classpath}" HardwareSimulatorMain "#{tmp_test}" 2>&1].chomp
+        setup(hdl_files, tmp)
+        tst_files(tmp).each do |t|
+          output = %x[java -classpath "#{Simulator.java_classpath}" HardwareSimulatorMain "#{t}" 2>&1].chomp
+          results[chip_name] = result =~ /End of script - Comparison ended successfully/
+        end
       end
+
+      results
     end
 
     def self.java_classpath
