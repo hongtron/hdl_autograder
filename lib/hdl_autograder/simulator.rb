@@ -1,7 +1,7 @@
 module HdlAutograder
   class Simulator
-    def initialize(grader)
-      @grader = grader
+    def initialize(project)
+      @project = project
     end
 
     def tst_files(tmp)
@@ -9,7 +9,7 @@ module HdlAutograder
     end
 
     def test_dir
-      @_test_dir ||= Dir.new("./resources/hdl_tests/#{@grader.project_number}")
+      @_test_dir ||= Dir.new("./resources/hdl_tests/#{@project_number}")
     end
 
     def test_resources
@@ -27,7 +27,7 @@ module HdlAutograder
         setup(hdl_files, tmp)
         tst_files(tmp).each do |t|
           output = %x[java -classpath "#{Simulator.java_classpath}" HardwareSimulatorMain "#{t}" 2>&1].chomp
-          results[chip_name] = result =~ /End of script - Comparison ended successfully/
+          results[chip_name] = output =~ /End of script - Comparison ended successfully/
         end
       end
 

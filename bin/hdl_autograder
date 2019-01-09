@@ -3,10 +3,11 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'hdl_autograder'
 
-project_number = ARGV[1]
-grader = HdlAutograder::Grader.new(project_number)
+project_number = ARGV[0]
+project = HdlAutograder::Project.new(project_number)
+simulator = HdlAutograder::Simulator.new(project)
 
-submission_archive = File.expand_path(ARGV[0])
+submission_archive = File.expand_path(ARGV[1])
 submission_dir = File.join(File.dirname(submission_archive), "extracted")
 %x[unzip "#{submission_archive}" -d "#{submission_dir}"]
 
@@ -16,5 +17,5 @@ submissions = Dir.glob(File.join(submission_dir, "*"))
 
 submissions.each do |s|
   s.extract!
-  grader.grade(s)
+  HdlAutograder::Grader.grade(project, simulator, s)
 end
