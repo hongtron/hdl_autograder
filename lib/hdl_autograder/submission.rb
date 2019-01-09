@@ -35,6 +35,17 @@ module HdlAutograder
     def hdl_files
       Dir.glob(File.join(extracted_location, "**/*.hdl"))
     end
+
+    def implementations(chips)
+      chips.map do |chip|
+        hdl_file = hdl_files.select { |f| f.match(/#{chip.name}.hdl/) }
+        Implementation.new(hdl_file, chip) if hdl_file
+      end.compact
+    end
+
+    def unimplemented_chips(chips)
+      chips.reject { |c| implementations.map(&:name).include?(c.name) }
+    end
   end
 end
 

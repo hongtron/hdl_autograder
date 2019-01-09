@@ -1,15 +1,12 @@
 module HdlAutograder
   class Grader
-    def initialize(project_number)
-      @project_number = project_number
-      @test_dir = Dir.new("./resources/hdl_tests/#{project_number}")
+    def initialize(project, simulator)
+      @project = project
+      @simulator = simulator
     end
 
-    def simulator
-      @_simulator ||= Simulator.new(self)
-    end
-
-    def grade(submission)
+    # should this be static?
+    def grade(project, simulator, submission)
       puts "Grading #{submission.student_name}..."
       feedback_file = File.join(submission.extracted_location, "#{submission.student_name}_feedback.txt")
       File.open(feedback_file, 'w') { |file| file.write(run_tests(submission)) }
@@ -77,11 +74,6 @@ module HdlAutograder
     def _built_in_chips
       Dir.glob(File.join(Dir.pwd, "bin", "nand2tetris_tools", "builtInChips", "*.hdl"))
         .map { |c| File.basename(c, ".hdl") }
-    end
-
-    def tests
-      Dir.glob(File.join(@test_dir.path, "**/*.tst"))
-        .map { |t| Test.new(t) }
     end
   end
 end
