@@ -1,12 +1,11 @@
 module HdlAutograder
   class Grader
-    def initialize(project, simulator)
+    def initialize(project)
       @project = project
-      @simulator = simulator
     end
 
     # should this be static?
-    def grade(project, simulator, submission)
+    def grade(project, submission)
       puts "Grading #{submission.student_name}..."
       feedback_file = File.join(submission.extracted_location, "#{submission.student_name}_feedback.txt")
       File.open(feedback_file, 'w') { |file| file.write(run_tests(submission)) }
@@ -17,10 +16,9 @@ module HdlAutograder
       functionality_grades = {}
       quality_grades = {}
 
-      chip_functionality = simulator.run(submission.hdl_files)
-
-      chip_functionality.each do |chip, passed|
-        functionality_grades[chip] = passed ? project_point_values[chip][:functionality] : "_"
+      HdlAutograder::Simulator.run(@project, submission).each do |chip, output|
+        passed = output =~ /End of script - Comparison ended successfully/
+        functionality_grades[chip] = passed ? chip.functionality_points : "_"
       end
 
       tests.each do |test|
