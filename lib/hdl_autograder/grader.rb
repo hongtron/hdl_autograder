@@ -16,21 +16,30 @@ module HdlAutograder
       project.chips.each do |chip|
         # does this actually work, or does it need to be the chip name?
         implementation = implementations.select { |i| i.chip == chip }
-        if test_results[chip]
+
+        if implementation && test_results[chip]
           functionality_points = chip.functionality_points
-          total_points += functionality_points + implementation.quality_points
+          # move some logic into Implementation
+          quality_points = implementation.quality_points(project.builtins)
+          num_parts_used = implementation.number_of_parts_used(project.builtins)
+          comments = "#{num_parts_used} parts used; #{chip.optimal_part_count} is optimal"
+          total_points += functionality_points + quality_points
+        elsif implementation
+          functionality_points, quality_points = "_"
+          comments = "does not pass all tests"
         else
-          functionality_points = "_"
+          functionality_points, quality_points = 0
+          comments = "not implemented"
         end
 
         functionality_score = "#{functionality_points}/#{chip.functionality_points}"
-        quality_score = "#{implementation.quality_points}/#{chip.quality_points}"
+        quality_score = "#{quality_points}/#{chip.quality_points}"
 
         feedback << [
           chip.name,
           functionality_score,
           quality_score,
-          comments(project, implementation),
+          comments,
         ].map { |x| x.ljust(20) }.join
       end
 
@@ -38,11 +47,6 @@ module HdlAutograder
       feedback = feedback.join("\n")
 
       write_feedback(submission, feedback)
-    end
-
-    def self.comments(project, implementation)
-      num_parts_used = implementation.number_of_parts_used(project.builtins)
-      "#{num_parts_used} parts used; #{implementation.chip.optimal_part_count} is optimal"
     end
 
     def self.write_feedback(submission, feedback)
