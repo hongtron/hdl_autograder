@@ -1,10 +1,23 @@
 module HdlAutograder
   class Chip
     def initialize(config)
-      @name = config[:name]
-      @functionality_points = config[:points][:functionality]
-      @quality_points = config[:points][:functionality]
-      @tests = config[:tests] || ["#{@name}.tst"]
+      @config = config
+    end
+
+    def name
+      @config[:name]
+    end
+
+    def functionality_points
+      @config[:points][:functionality]
+    end
+
+    def quality_points
+      @config[:points][:quality]
+    end
+
+    def tests
+      @config[:tests] || [name]
     end
   end
 end

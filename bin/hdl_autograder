@@ -5,7 +5,6 @@ require 'hdl_autograder'
 
 project_number = ARGV[0]
 project = HdlAutograder::Project.new(project_number)
-simulator = HdlAutograder::Simulator.new(project)
 
 submission_archive = File.expand_path(ARGV[1])
 submission_dir = File.join(File.dirname(submission_archive), "extracted")
@@ -17,5 +16,5 @@ submissions = Dir.glob(File.join(submission_dir, "*"))
 
 submissions.each do |s|
   s.extract!
-  HdlAutograder::Grader.grade(project, simulator, s)
+  HdlAutograder::Grader.grade(project, s)
 end

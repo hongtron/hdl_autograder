@@ -1,33 +1,20 @@
 module HdlAutograder
   class Simulator
-    def initialize(project)
-      @project = project
-    end
-
-    def tst_files(tmp)
-      Dir.glob(File.join(tmp, "**/*.tst"))
-    end
-
-    def test_dir
-      @_test_dir ||= Dir.new("./resources/hdl_tests/#{@project_number}")
-    end
-
-    def test_resources
-      Dir.glob(File.join(test_dir.path, "**/*.{cmp,tst}"))
-    end
-
-    def setup(hdl_files, tmp)
-      FileUtils.copy_entry("bin/nand2tetris_tools/builtInChips", tmp)
-      (hdl_files + test_resources).each { |f| FileUtils.copy(f, tmp) }
-    end
-
-    def run(hdl_files)
+    def self.run(project, submission)
       results = {}
       Dir.mktmpdir do |tmp|
-        setup(hdl_files, tmp)
-        tst_files(tmp).each do |t|
-          output = %x[java -classpath "#{Simulator.java_classpath}" HardwareSimulatorMain "#{t}" 2>&1].chomp
-          results[chip_name] = output =~ /End of script - Comparison ended successfully/
+        FileUtils.copy_entry("bin/nand2tetris_tools/builtInChips", tmp)
+        implementations = submission.implementations(project.chips)
+        implementations.each { |i| FileUtils.copy(i.hdl_file, tmp) }
+        project.chips.each do |chip|
+          # does this actually work, or does it need to be the chip name?
+          next unless implementations.map(&:chip).include?(chip)
+          chip.tests.each do |test|
+            FileUtils.copy(File.join(".", "resources", "hdl_tests", "#{test}.tst"), tmp)
+            FileUtils.copy(File.join(".", "resources", "hdl_tests", "#{test}.cmp"), tmp)
+            output = %x[java -classpath "#{Simulator.java_classpath}" HardwareSimulatorMain "#{t}" 2>&1].chomp
+            results[chip] = output
+          end
         end
       end
 
