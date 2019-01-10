@@ -1,77 +1,54 @@
 module HdlAutograder
   class Grader
-    def initialize(project)
-      @project = project
-    end
-
-    # should this be static?
-    def grade(project, submission)
+    def self.grade(project, submission)
       puts "Grading #{submission.student_name}..."
-      feedback_file = File.join(submission.extracted_location, "#{submission.student_name}_feedback.txt")
-      File.open(feedback_file, 'w') { |file| file.write(run_tests(submission)) }
-    end
-
-    def run_tests(submission)
-      project_point_values = RUBRICS[@project_number]
-      functionality_grades = {}
+      test_results = {}
       quality_grades = {}
-
-      HdlAutograder::Simulator.run(@project, submission).each do |chip, output|
-        passed = output =~ /End of script - Comparison ended successfully/
-        functionality_grades[chip] = passed ? chip.functionality_points : "_"
-      end
-
-      tests.each do |test|
-        test_point_values = project_point_values[test.chip_name]
-        quality_points = test_point_values[:quality]
-        optimal_part_count = test_point_values[:optimal_part_count]
-        if chip_functionality[test.chip_name]
-          quality_grades[test.chip_name] = _quality_points(test, quality_points, optimal_part_count)
-        else
-          quality_grades[test.chip_name] = "_"
-        end
-      end
-
-      build_feedback(project_point_values, functionality_grades, quality_grades)
-    end
-
-    def build_feedback(project_point_values, functionality_grades, quality_grades)
-      chips = functionality_grades.keys
-      raise unless functionality_grades.keys & quality_grades.keys == chips
-
       total_points = 0
-      feedback = [] << FEEDBACK_TEMPLATES[@project_number]
+      feedback = [] << FEEDBACK_TEMPLATES[project_number]
+      implementations = submission.implementations(project.chips)
 
-      chips.each do |c|
-        functionality_points = functionality_grades[c]
-        quality_points = quality_grades[c][0]
-        comments = quality_grades[c][1]
+      HdlAutograder::Simulator.run(project, implementations).each do |chip, outputs|
+        all_tests_passed = outputs.map { |o| o =~ /End of script - Comparison ended successfully/ }.all?
+        test_results[chip] = all_tests_passed
+      end
 
-        total_points += functionality_points + quality_points unless functionality_points == "_"
-        functionality_score = "#{functionality_points}/#{project_point_values[c][:functionality]}"
-        quality_score = "#{quality_points}/#{project_point_values[c][:quality]}"
 
-        feedback << [c, functionality_score, quality_score, comments].compact.map { |x| x.ljust(20) }.join
+      project.chips.each do |chip|
+        # does this actually work, or does it need to be the chip name?
+        implementation = implementations.select { |i| i.chip == chip }
+        if test_results[chip]
+          functionality_points = chip.functionality_points
+          total_points += functionality_points + implementation.quality_points
+        else
+          functionality_points = "_"
+        end
+
+        functionality_score = "#{functionality_points}/#{chip.functionality_points}"
+        quality_score = "#{implementation.quality_points}/#{chip.quality_points}"
+
+        feedback << [
+          chip.name,
+          functionality_score,
+          quality_score,
+          comments(project, implementation),
+        ].map { |x| x.ljust(20) }.join
       end
 
       feedback << "Total points: #{total_points}"
-      feedback.join("\n")
+      feedback = feedback.join("\n")
+
+      write_feedback(submission, feedback)
     end
 
-    def _quality_points(test, quality_points, optimal_part_count)
-      chipset = _built_in_chips
-      chipset += ["CPU", "Memory"] if @project_number == "5"
-      comments = "#{test.number_of_parts_used(chipset)} parts used; #{optimal_part_count} is optimal" if test.chip_implemented?
-      quality_deductions = test.number_of_parts_used(chipset) - optimal_part_count
-      quality_points_awarded = quality_points - quality_deductions
-      quality_points_awarded = 0 if quality_points_awarded < 0
-
-      [quality_points_awarded, comments]
+    def self.comments(project, implementation)
+      num_parts_used = implementation.number_of_parts_used(project.builtins)
+      "#{num_parts_used} parts used; #{implementation.chip.optimal_part_count} is optimal"
     end
 
-    def _built_in_chips
-      Dir.glob(File.join(Dir.pwd, "bin", "nand2tetris_tools", "builtInChips", "*.hdl"))
-        .map { |c| File.basename(c, ".hdl") }
+    def self.write_feedback(submission, feedback)
+      feedback_file = File.join(submission.extracted_location, "#{submission.student_name}_feedback.txt")
+      File.open(feedback_file, 'w') { |f| f.write(feedback) }
     end
   end
 end

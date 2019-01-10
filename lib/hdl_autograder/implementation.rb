@@ -8,6 +8,11 @@ module HdlAutograder
       @chip = chip
     end
 
+    def quality_points(builtins)
+      quality_deductions = number_of_parts_used(builtins) - @chip.optimal_part_count
+      [@chip.quality_points - quality_deductions, 0].max
+    end
+
     def number_of_parts_used(builtins)
       File.read(@hdl_file)
         .split("\r\n")

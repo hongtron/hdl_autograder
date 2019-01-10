@@ -1,19 +1,19 @@
 module HdlAutograder
   class Simulator
-    def self.run(project, submission)
-      results = {}
+    def self.run(project, implementations)
+      results = Hash.new { |h, k| h[k] = [] }
       Dir.mktmpdir do |tmp|
         FileUtils.copy_entry("bin/nand2tetris_tools/builtInChips", tmp)
-        implementations = submission.implementations(project.chips)
         implementations.each { |i| FileUtils.copy(i.hdl_file, tmp) }
         project.chips.each do |chip|
           # does this actually work, or does it need to be the chip name?
+          next unless implementations.map(&:chip).include?(chip)
           next unless implementations.map(&:chip).include?(chip)
           chip.tests.each do |test|
             FileUtils.copy(File.join(".", "resources", "hdl_tests", "#{test}.tst"), tmp)
             FileUtils.copy(File.join(".", "resources", "hdl_tests", "#{test}.cmp"), tmp)
             output = %x[java -classpath "#{Simulator.java_classpath}" HardwareSimulatorMain "#{t}" 2>&1].chomp
-            results[chip] = output
+            results[chip] << output
           end
         end
       end

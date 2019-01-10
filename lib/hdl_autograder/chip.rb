@@ -8,6 +8,10 @@ module HdlAutograder
       @config[:name]
     end
 
+    def optimal_part_count
+      @config[:optimal_part_count]
+    end
+
     def functionality_points
       @config[:points][:functionality]
     end

@@ -2,31 +2,31 @@
   chips:
     -
       name: "HalfAdder"
-      part_count: 2
+      optimal_part_count: 2
       points:
         functionality: 6
         quality: 3
     -
       name: "FullAdder"
-      part_count: 3
+      optimal_part_count: 3
       points:
         functionality: 8
         quality: 4
     -
       name: "Add16"
-      part_count: 16
+      optimal_part_count: 16
       points:
         functionality: 8
         quality: 4
     -
       name: "Inc16"
-      part_count: 1
+      optimal_part_count: 1
       points:
         functionality: 10
         quality: 5
     -
       name: "ALU"
-      part_count: 13
+      optimal_part_count: 13
       points:
         functionality: 35
         quality: 17
@@ -38,7 +38,7 @@
   chips:
     -
       name: "Computer"
-      part_count: 3
+      optimal_part_count: 3
       points:
         functionality: 15
         quality: 7
