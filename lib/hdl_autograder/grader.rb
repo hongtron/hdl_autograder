@@ -3,7 +3,6 @@ module HdlAutograder
     def self.grade(project, submission)
       puts "Grading #{submission.student_name}..."
       test_results = {}
-      quality_grades = {}
       total_points = 0
       feedback = [] << FEEDBACK_TEMPLATES[project_number]
       implementations = submission.implementations(project.chips)

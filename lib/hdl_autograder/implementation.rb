@@ -1,6 +1,7 @@
 module HdlAutograder
   class Implementation
     extend Forwardable
+    # necessary?
     def_delegators :@chip, :name
 
     def initialize(hdl_file, chip)
