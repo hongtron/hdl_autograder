@@ -1,7 +1,7 @@
 module HdlAutograder
   class Implementation
     extend Forwardable
-    attr_accessor :functionality_points, :quality_points
+    attr_accessor :functionality_points, :quality_points, :hdl_file, :chip
     # necessary?
     def_delegators :@chip, :name
 
@@ -9,9 +9,12 @@ module HdlAutograder
       @hdl_file = hdl_file
       @chip = chip
       @comments = ""
+      @functionality_points = nil
+      @quality_points = nil
     end
 
     def implemented?
+      binding.pry if @hdl_file.instance_of?(Array)
       @hdl_file && File.exist?(@hdl_file)
     end
 

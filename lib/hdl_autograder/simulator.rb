@@ -10,7 +10,14 @@ module HdlAutograder
           i.chip.tests.each do |test|
             FileUtils.copy(File.join(".", "resources", "hdl_tests", "#{test}.tst"), tmp)
             FileUtils.copy(File.join(".", "resources", "hdl_tests", "#{test}.cmp"), tmp)
-            output = %x[java -classpath "#{Simulator.java_classpath}" HardwareSimulatorMain "#{t}" 2>&1].chomp
+            output = <<-`CMD`.chomp
+              java \
+              -classpath "#{Simulator.java_classpath}" \
+              HardwareSimulatorMain \
+              "#{File.join(tmp, "#{test}.tst")}" \
+              2>&1
+            CMD
+
             results[i] << output
           end
         end

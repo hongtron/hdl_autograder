@@ -5,23 +5,23 @@ module HdlAutograder
     end
 
     def name
-      @config[:name]
+      @config["name"]
     end
 
     def optimal_part_count
-      @config[:optimal_part_count]
+      @config["optimal_part_count"]
     end
 
     def functionality_points
-      @config[:points][:functionality]
+      @config["points"]["functionality"]
     end
 
     def quality_points
-      @config[:points][:quality]
+      @config["points"]["quality"]
     end
 
     def tests
-      @config[:tests] || [name]
+      @config["tests"] || [name]
     end
   end
 end
