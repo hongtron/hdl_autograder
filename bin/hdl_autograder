@@ -13,6 +13,7 @@ submission_dir = File.join(File.dirname(submission_archive), "extracted")
 submissions = Dir.glob(File.join(submission_dir, "*"))
   .reject { |s| s =~ /__MACOSX/ }
   .map { |archive| HdlAutograder::Submission.new(project, archive) }
+  .select(&:supported_ext?)
 
 submissions.each do |s|
   s.extract!
