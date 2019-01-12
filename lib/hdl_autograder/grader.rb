@@ -1,24 +1,17 @@
 module HdlAutograder
   class Grader
-    def self.grade(project, submission)
+    def self.grade(submission)
       puts "Grading #{submission.student_name}..."
-      submission_feedback = [] << FEEDBACK_TEMPLATES[project_number]
-      implementations = submission.implementations(project.chips)
 
-      test_output = HdlAutograder::Simulator.run(implementations)
+      test_output = HdlAutograder::Simulator.run(submission.implementations)
       results = test_results(test_output)
 
-      implementations.each do |i|
-        grade_implementation(i, project.builtins, results[i])
+      submission.implementations.each do |i|
+        grade_implementation(i, results[i], project.builtins)
         submission_feedback << i.feedback
       end
 
-
-
-      feedback << "Total points: #{total_points}"
-      feedback = feedback.join("\n")
-
-      write_feedback(submission, feedback)
+      write_feedback(submission.feedback)
     end
 
     def self.test_results(test_output)
@@ -32,7 +25,7 @@ module HdlAutograder
       results
     end
 
-    def self.grade_implementation(implementation, builtins, all_tests_passed)
+    def self.grade_implementation(implementation, all_tests_passed, builtins)
       if implementation.implemented?
         grade_functionality(implementation, all_tests_passed)
         grade_quality(implementation, builtins)
@@ -56,13 +49,21 @@ module HdlAutograder
     end
 
     def self.grade_quality(implementation, builtins)
-      possible_points = implementation.chip.quality_points
-      parts_used = implementation.number_of_parts_used(builtins)
-      optimal_count = implementation.chip.optimal_part_count
-      quality_deductions = parts_used - optimal_count
+      unless implementation.functionality_points
+        raise "quality must be graded after functionality"
+      end
 
-      implementation.quality_points = [possible_points - quality_deductions, 0].max
-      implementation.add_comment("#{parts_used} parts used; #{optimal_count} is optimal")
+      if implementation.functionality_points == :review_needed
+        implementation.quality_points = :review_needed
+      else
+        possible_points = implementation.chip.quality_points
+        parts_used = implementation.number_of_parts_used(builtins)
+        optimal_count = implementation.chip.optimal_part_count
+        quality_deductions = parts_used - optimal_count
+
+        implementation.quality_points = [possible_points - quality_deductions, 0].max
+        implementation.add_comment("#{parts_used} parts used; #{optimal_count} is optimal")
+      end
     end
 
     def self.write_feedback(submission, feedback)
