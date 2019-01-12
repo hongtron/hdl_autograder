@@ -39,12 +39,16 @@ module HdlAutograder
     def implementations(chips)
       chips.map do |chip|
         hdl_file = hdl_files.select { |f| f.match(/#{chip.name}.hdl/) }
-        Implementation.new(hdl_file, chip) if hdl_file
-      end.compact
+        Implementation.new(hdl_file, chip)
+      end
     end
 
-    def unimplemented_chips(chips)
-      chips.reject { |c| implementations.map(&:name).include?(c.name) }
+    # def unimplemented_chips(chips)
+    #   chips.reject { |c| implementations.map(&:name).include?(c.name) }
+    # end
+
+    def total_points(chips)
+
     end
   end
 end
