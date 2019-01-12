@@ -7,8 +7,15 @@ module HdlAutograder
       @project = project
     end
 
+    def ext
+      File.extname(@archive)
+    end
+
+    def supported_ext?
+      [".zip", ".gz", ".tar"].include?(ext)
+    end
+
     def extract!
-      ext = File.extname(@archive)
       case ext
       when ".zip"
         %x[unzip "#{@archive.path}" -d "#{extracted_location}"]
@@ -17,7 +24,7 @@ module HdlAutograder
       when ".tar"
         _untar(gzipped: false)
       else
-        puts "unhandled ext: #{ext}"
+        raise "unhandled ext: #{ext}"
       end
     end
 
