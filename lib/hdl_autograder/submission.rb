@@ -1,7 +1,8 @@
 module HdlAutograder
   class Submission
-    def initialize(archive)
+    def initialize(project, archive)
       @archive = File.new(archive)
+      @project = project
     end
 
     def extract!
@@ -36,19 +37,27 @@ module HdlAutograder
       Dir.glob(File.join(extracted_location, "**/*.hdl"))
     end
 
-    def implementations(chips)
-      chips.map do |chip|
+    def implementations
+      @project.chips.map do |chip|
         hdl_file = hdl_files.select { |f| f.match(/#{chip.name}.hdl/) }
         Implementation.new(hdl_file, chip)
       end
     end
 
-    # def unimplemented_chips(chips)
-    #   chips.reject { |c| implementations.map(&:name).include?(c.name) }
-    # end
+    def total_points
+      [
+      implementations.map(&:functionality_points).select { |x| x.instance_of?(Integer) },
+      implementations.map(&:quality_points).select { |x| x.instance_of?(Integer) },
+      ].flatten.reduce(:+)
+    end
 
-    def total_points(chips)
-
+    def feedback
+      (
+        [] <<
+        FEEDBACK_TEMPLATES[@project.project_number] <<
+        implementations.map(&:feedback) <<
+        "Total points: #{total_points}"
+      ).join("\n")
     end
   end
 end
