@@ -7,17 +7,20 @@ module HdlAutograder
       results = test_results(test_output)
 
       submission.implementations.each do |i|
-        grade_implementation(i, results[i], project.builtins)
-        submission_feedback << i.feedback
+        grade_implementation(
+          i,
+          results[i],
+          submission.project.builtins
+        )
       end
 
-      write_feedback(submission.feedback)
+      write_feedback(submission)
     end
 
     def self.test_results(test_output)
       results = {}
       test_output.each do |i, output|
-        results[i] = outputs
+        results[i] = output
           .map { |o| o =~ /End of script - Comparison ended successfully/ }
           .all?
       end
@@ -66,9 +69,9 @@ module HdlAutograder
       end
     end
 
-    def self.write_feedback(submission, feedback)
+    def self.write_feedback(submission)
       feedback_file = File.join(submission.extracted_location, "#{submission.student_name}_feedback.txt")
-      File.open(feedback_file, 'w') { |f| f.write(feedback) }
+      File.open(feedback_file, 'w') { |f| f.write(submission.feedback) }
     end
   end
 end

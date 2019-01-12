@@ -1,5 +1,7 @@
 module HdlAutograder
   class Submission
+    attr_accessor :project
+
     def initialize(project, archive)
       @archive = File.new(archive)
       @project = project
@@ -38,8 +40,8 @@ module HdlAutograder
     end
 
     def implementations
-      @project.chips.map do |chip|
-        hdl_file = hdl_files.select { |f| f.match(/#{chip.name}.hdl/) }
+      @implementations ||= @project.chips.map do |chip|
+        hdl_file = hdl_files.find { |f| f.match(/\/#{chip.name}.hdl/) }
         Implementation.new(hdl_file, chip)
       end
     end
