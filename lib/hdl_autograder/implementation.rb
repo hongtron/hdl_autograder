@@ -14,7 +14,6 @@ module HdlAutograder
     end
 
     def implemented?
-      binding.pry if @hdl_file.instance_of?(Array)
       @hdl_file && File.exist?(@hdl_file)
     end
 
@@ -23,8 +22,8 @@ module HdlAutograder
     end
 
     def number_of_parts_used(builtins)
-      File.read(@hdl_file)
-        .split("\r\n")
+      File.new(@hdl_file)
+        .readlines
         .map(&:strip)
         .select { |line| line.start_with?(*builtins) }
         .length
