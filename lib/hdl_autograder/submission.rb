@@ -44,6 +44,7 @@ module HdlAutograder
 
     def hdl_files
       Dir.glob(File.join(extracted_location, "**/*.hdl"))
+        .reject { |f| File.read(f).include?("BUILTIN") }
     end
 
     def implementations
