@@ -28,5 +28,9 @@ module HdlAutograder
     def additional_builtins
       @project_config["additional_builtins"]
     end
+
+    def feedback_template
+      @project_config["feedback_template"]
+    end
   end
 end

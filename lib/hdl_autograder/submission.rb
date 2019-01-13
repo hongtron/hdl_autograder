@@ -64,7 +64,7 @@ module HdlAutograder
     def feedback
       (
         [] <<
-        FEEDBACK_TEMPLATES[@project.project_number] <<
+        @project.feedback_template <<
         implementations.map(&:feedback) <<
         "Total points: #{total_points}"
       ).join("\n")
