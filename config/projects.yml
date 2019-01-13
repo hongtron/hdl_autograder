@@ -116,6 +116,7 @@
   additional_builtins:
     - "CPU"
     - "Memory"
+  load_hack_programs: true
   chips:
     -
       name: "Memory"

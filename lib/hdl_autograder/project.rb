@@ -32,5 +32,9 @@ module HdlAutograder
     def feedback_template
       @project_config["feedback_template"]
     end
+
+    def load_hack_programs
+      @project_config["load_hack_programs"] || false
+    end
   end
 end
