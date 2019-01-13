@@ -34,6 +34,9 @@ module HdlAutograder
         "bin/nand2tetris_tools/bin/lib/Hack.jar",
         "bin/nand2tetris_tools/bin/lib/Simulators.jar",
         "bin/nand2tetris_tools/bin/lib/Compilers.jar",
+        "bin/nand2tetris_tools/bin/lib/TranslatorsGUI.jar",
+        "bin/nand2tetris_tools/bin/lib/SimulatorsGUI.jar",
+        "bin/nand2tetris_tools/bin/lib/HackGUI.jar",
       ]
         .compact
         .join(":")
