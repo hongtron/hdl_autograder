@@ -18,7 +18,7 @@ module HdlAutograder
     end
 
     def builtins
-      [BUILTINS, @additional_builtins].compact.reduce(:+)
+      [BUILTINS, additional_builtins].compact.reduce(:+)
     end
 
     def chips
