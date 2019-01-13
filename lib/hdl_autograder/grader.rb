@@ -3,7 +3,11 @@ module HdlAutograder
     def self.grade(submission)
       puts "Grading #{submission.student_name}..."
 
-      test_output = HdlAutograder::Simulator.run(submission.implementations)
+      test_output = HdlAutograder::Simulator.run(
+        submission.implementations,
+        submission.project.load_hack_programs
+      )
+
       results = test_results(test_output)
 
       submission.implementations.each do |i|

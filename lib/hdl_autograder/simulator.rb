@@ -1,9 +1,10 @@
 module HdlAutograder
   class Simulator
-    def self.run(implementations)
+    def self.run(implementations, load_hack_programs = false)
       results = Hash.new { |h, k| h[k] = [] }
       Dir.mktmpdir do |tmp|
         FileUtils.copy_entry("bin/nand2tetris_tools/builtInChips", tmp)
+        FileUtils.copy_entry("resources/hack_programs", tmp) if load_hack_programs
         implementations.each do |i|
           next unless i.implemented?
           FileUtils.copy(i.hdl_file, tmp)
