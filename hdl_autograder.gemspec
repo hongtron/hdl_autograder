@@ -15,5 +15,6 @@ Gem::Specification.new do |gem|
   gem.version       = HdlAutograder::VERSION
 
   gem.add_development_dependency "rspec"
+  gem.add_development_dependency "pry-rescue", '>= 1.5.0'
   gem.add_development_dependency "pry-byebug"
 end
