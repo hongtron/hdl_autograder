@@ -2,23 +2,29 @@ module HdlAutograder
   class Submission
     attr_accessor :project
 
-    def initialize(project, archive)
-      @archive = File.new(archive)
+    def initialize(project, source)
+      @source = File.new(source)
       @project = project
     end
 
     def ext
-      File.extname(@archive)
+      File.extname(@source)
     end
 
     def supported_ext?
       [".zip", ".gz", ".tar"].include?(ext)
     end
 
+    def compressed?
+      File.file?(@source) && supported_ext?
+    end
+
     def extract!
+      return unless compressed?
+
       case ext
       when ".zip"
-        %x[unzip "#{@archive.path}" -d "#{extracted_location}"]
+        %x[unzip "#{@source.path}" -d "#{extracted_location}"]
       when ".gz"
         _untar(gzipped: true)
       when ".tar"
@@ -31,19 +37,24 @@ module HdlAutograder
     def _untar(gzipped: true)
       Dir.mkdir(extracted_location)
       params = gzipped ? "xzf" : "xf"
-      %x[tar -#{params} "#{@archive.path}" -C "#{extracted_location}"]
+      %x[tar -#{params} "#{@source.path}" -C "#{extracted_location}"]
     end
 
     def extracted_location
-      File.join(File.dirname(@archive), student_name)
+      File.join(File.dirname(@source), student_name)
     end
 
     def student_name
-      /extracted\/([a-z]+)_/.match(@archive.path).captures.first
+      if compressed?
+      /extracted\/([a-z]+)_/.match(@source.path).captures.first
+      else
+        File.basename(@source)
+      end
     end
 
     def hdl_files
-      Dir.glob(File.join(extracted_location, "**/*.hdl"))
+      source_dir = compressed? ? extracted_location : @source
+      Dir.glob(File.join(source_dir, "**/*.hdl"))
         .reject { |f| File.read(f).include?("BUILTIN") }
     end
 
