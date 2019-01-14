@@ -3,6 +3,8 @@ module HdlAutograder
     def self.grade(submission)
       puts "Grading #{submission.student_name}..."
 
+      submission.extract!
+
       test_output = HdlAutograder::Simulator.run(
         submission.implementations,
         submission.project.load_hack_programs

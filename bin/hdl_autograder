@@ -1,21 +1,42 @@
 #!/usr/bin/env ruby
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require 'optparse'
 require 'hdl_autograder'
 
-project_number = ARGV[0]
-project = HdlAutograder::Project.new(project_number)
+def main(argv)
+  project_number = nil
+  archive = nil
+  source = nil
 
-submission_archive = File.expand_path(ARGV[1])
-submission_dir = File.join(File.dirname(submission_archive), "extracted")
-%x[unzip "#{submission_archive}" -d "#{submission_dir}"]
+  OptionParser.new do |opts|
+    opts.banner = "bin/hdl_autograder -p <project> [-a <archive> || -s <submission>]"
+    opts.on("-p", "--project PROJECT_NUMBER", "Project number of assignment to be graded") { |o| project_number = o }
+    opts.on("-a", "--archive ARCHIVE", ".zip file containing all submissions to be graded") { |o| archive = File.expand_path(o) }
+    opts.on("-s", "--source SOURCE", "Directory of an individual submission to be graded") { |o| source = File.expand_path(o) }
+  end.parse!(argv)
 
-submissions = Dir.glob(File.join(submission_dir, "*"))
-  .reject { |s| s =~ /__MACOSX/ }
-  .map { |archive| HdlAutograder::Submission.new(project, archive) }
-  .select(&:supported_ext?)
+  raise "Must pass either archive or source, but not both" unless nil ^ archive ^ source
+  raise "Archive must be a .zip file" if archive && !File.extname(archive) == ".zip"
+  raise "Source must be a directory" if source && !File.directory?(source)
 
-submissions.each do |s|
-  s.extract!
-  HdlAutograder::Grader.grade(s)
+  project = HdlAutograder::Project.new(project_number)
+
+  if archive
+    submissions_dir = File.join(File.dirname(archive), "extracted")
+    %x[unzip "#{archive}" -d "#{submissions_dir}"]
+
+    submissions = Dir.glob(File.join(submissions_dir, "*"))
+      .map { |source| HdlAutograder::Submission.new(project, source) }
+      .select(&:supported_ext?)
+
+    submissions.each { |s| HdlAutograder::Grader.grade(s) }
+  else
+    HdlAutograder::Grader.grade(
+      HdlAutograder::Submission.new(project, source)
+    )
+  end
+
 end
+
+main(ARGV) if __FILE__ == $0
