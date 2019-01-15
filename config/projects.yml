@@ -16,91 +16,91 @@
   chips:
     -
       name: "Not"
-      optimal_part_count: "unknown"
+      optimal_part_count: 1
       points:
         functionality: 3
         quality: 1
     -
       name: "And"
-      optimal_part_count: "unknown"
+      optimal_part_count: 2
       points:
         functionality: 3
         quality: 1
     -
       name: "Or"
-      optimal_part_count: "unknown"
+      optimal_part_count: 3
       points:
         functionality: 4
         quality: 2
     -
       name: "Xor"
-      optimal_part_count: "unknown"
+      optimal_part_count: 3
       points:
         functionality: 4
         quality: 2
     -
       name: "Not16"
-      optimal_part_count: "unknown"
+      optimal_part_count: 16
       points:
         functionality: 3
         quality: 2
     -
       name: "And16"
-      optimal_part_count: "unknown"
+      optimal_part_count: 16
       points:
         functionality: 3
         quality: 2
     -
       name: "Or16"
-      optimal_part_count: "unknown"
+      optimal_part_count: 16
       points:
         functionality: 3
         quality: 2
     -
       name: "Or8Way"
-      optimal_part_count: "unknown"
+      optimal_part_count: 7
       points:
         functionality: 5
         quality: 3
     -
       name: "Mux"
-      optimal_part_count: "unknown"
+      optimal_part_count: 4
       points:
         functionality: 5
         quality: 3
     -
       name: "DMux"
-      optimal_part_count: "unknown"
+      optimal_part_count: 3
       points:
         functionality: 5
         quality: 3
     -
       name: "Mux16"
-      optimal_part_count: "unknown"
+      optimal_part_count: 15
       points:
         functionality: 3
         quality: 2
     -
       name: "Mux4Way16"
-      optimal_part_count: "unknown"
+      optimal_part_count: 3
       points:
         functionality: 6
         quality: 3
     -
       name: "Mux8Way16"
-      optimal_part_count: "unknown"
+      optimal_part_count: 3
       points:
         functionality: 6
         quality: 3
     -
       name: "DMux4Way"
-      optimal_part_count: "unknown"
+      optimal_part_count: 3
       points:
         functionality: 6
         quality: 3
     -
       name: "DMux8Way"
-      optimal_part_count: "unknown"
+      optimal_part_count: 3
       points:
         functionality: 6
         quality: 3
