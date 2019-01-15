@@ -18,5 +18,8 @@ describe HdlAutograder::Simulator do
       result = HdlAutograder::Simulator.run("spec/resources/nand2tetris/02/HalfAdder.tst")
       expect(result).to eq("End of script - Comparison ended successfully")
     end
+
+    it "runs all tests for chips with multiple tests" do
+    end
   end
 end
