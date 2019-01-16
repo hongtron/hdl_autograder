@@ -70,6 +70,10 @@ module HdlAutograder
         optimal_count = implementation.chip.optimal_part_count
         quality_deductions = parts_used - optimal_count
 
+        if quality_deductions < 0
+          raise "more optimal part count of #{parts_used} found for #{implementation.chip.name}!"
+        end
+
         implementation.quality_points = [possible_points - quality_deductions, 0].max
         implementation.add_comment("#{parts_used} parts used; #{optimal_count} is optimal")
       end
