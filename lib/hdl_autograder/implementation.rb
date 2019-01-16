@@ -27,10 +27,11 @@ module HdlAutograder
 
     def number_of_parts_used(builtins)
       File.new(@hdl_file)
-        .readlines
-        .map(&:strip)
-        .map { |line| line.split(/\r|\n/) }
+        .read
+        .encode(:universal_newline => true)
+        .split("\n")
         .flatten
+        .map(&:strip)
         .select { |line| line.start_with?(*builtins) }
         .length
     end
