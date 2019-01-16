@@ -31,6 +31,7 @@ module HdlAutograder
         .encode(:universal_newline => true)
         .split("\n")
         .flatten
+        .map { |line| line.scan(/[[:print:]]/).join }
         .map(&:strip)
         .select { |line| line.start_with?(*builtins) }
         .length
