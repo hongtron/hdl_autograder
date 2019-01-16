@@ -18,7 +18,11 @@ module HdlAutograder
     end
 
     def add_comment(comment)
-      @comments << "; " << comment
+      @comments = if @comments.empty?
+                    comment
+                  else
+                    [@comments, comment].join("; ")
+                  end
     end
 
     def number_of_parts_used(builtins)
