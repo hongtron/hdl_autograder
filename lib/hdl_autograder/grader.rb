@@ -78,7 +78,10 @@ module HdlAutograder
         end
 
         implementation.quality_points = [possible_points - quality_deductions, 0].max
-        implementation.add_comment("#{parts_used} parts used; #{optimal_count} is optimal")
+
+        unless parts_used == optimal_count
+          implementation.add_comment("#{parts_used} parts used; #{optimal_count} is optimal")
+        end
       end
     end
 
