@@ -25,6 +25,8 @@ module HdlAutograder
       File.new(@hdl_file)
         .readlines
         .map(&:strip)
+        .map { |line| line.split(/\r|\n/) }
+        .flatten
         .select { |line| line.start_with?(*builtins) }
         .length
     end
