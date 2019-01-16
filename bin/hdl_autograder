@@ -23,7 +23,8 @@ def main(argv)
   project = HdlAutograder::Project.new(project_number)
 
   if archive
-    submissions_dir = File.join(File.dirname(archive), "extracted")
+    output_dir = File.basename(archive, ".zip") + "_graded"
+    submissions_dir = File.join(File.dirname(archive), output_dir)
     %x[unzip "#{archive}" -d "#{submissions_dir}"]
 
     submissions = Dir.glob(File.join(submissions_dir, "*"))
