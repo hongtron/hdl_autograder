@@ -71,10 +71,7 @@ module HdlAutograder
         quality_deductions = parts_used - optimal_count
 
         if quality_deductions < 0
-          raise <<~MSG
-          More optimal part count of #{parts_used} found for
-          #{implementation.chip.name} (or, error in part count)!"
-          MSG
+          raise "More optimal part count found for #{implementation.chip.name}"
         end
 
         implementation.quality_points = [possible_points - quality_deductions, 0].max
