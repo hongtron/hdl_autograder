@@ -46,7 +46,7 @@ module HdlAutograder
 
     def student_name
       if compressed?
-      /extracted\/([a-z]+)_/.match(@source.path).captures.first
+      /_graded\/([a-z]+)_/.match(@source.path).captures.first
       else
         File.basename(@source)
       end
