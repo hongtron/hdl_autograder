@@ -1,5 +1,7 @@
 module HdlAutograder
   class Grader
+    EXCEPTIONAL_IMPLEMENTATION_BONUS = 2
+
     def self.grade(submission)
       puts "Grading #{submission.student_name}..."
 
@@ -68,15 +70,23 @@ module HdlAutograder
         possible_points = implementation.chip.quality_points
         parts_used = implementation.number_of_parts_used(builtins)
         optimal_count = implementation.chip.optimal_part_count
+        exceptional_count = implementation.chip.exceptional_part_count
         quality_deductions = parts_used - optimal_count
 
         if quality_deductions < 0
-          raise "More optimal part count found for #{implementation.chip.name}"
+          if parts_used == exceptional_count
+            implementation.award_quality_points(EXCEPTIONAL_IMPLEMENTATION_BONUS)
+            implementation.add_comment("nice work! +#{EXCEPTIONAL_IMPLEMENTATION_BONUS}")
+            quality_deductions = 0
+          else
+            raise "More optimal part count found for #{implementation.chip.name}"
+          end
         end
 
-        implementation.quality_points = [possible_points - quality_deductions, 0].max
+        points_earned = [possible_points - quality_deductions, 0].max
+        implementation.award_quality_points(points_earned)
 
-        unless parts_used == optimal_count
+        unless [optimal_count, exceptional_count].include?(parts_used)
           implementation.add_comment("#{parts_used} parts used; #{optimal_count} is optimal")
         end
       end

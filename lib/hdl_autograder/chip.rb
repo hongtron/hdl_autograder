@@ -12,6 +12,10 @@ module HdlAutograder
       @config["optimal_part_count"]
     end
 
+    def exceptional_part_count
+      @config["exceptional_part_count"]
+    end
+
     def functionality_points
       @config["points"]["functionality"]
     end

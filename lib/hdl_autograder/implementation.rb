@@ -42,6 +42,11 @@ module HdlAutograder
       "#{functionality_points}/#{@chip.functionality_points}"
     end
 
+    def award_quality_points(pts)
+      @quality_points ||= 0
+      @quality_points += pts
+    end
+
     def quality_score
       raise "chip has not been graded yet" unless quality_points
       "#{quality_points}/#{@chip.quality_points}"

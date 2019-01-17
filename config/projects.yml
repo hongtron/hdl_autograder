@@ -53,6 +53,7 @@
     -
       name: "Or16"
       optimal_part_count: 16
+      exceptional_part_count: 4
       points:
         functionality: 3
         quality: 2
