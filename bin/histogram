@@ -1,0 +1,42 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+usage() {
+  cat <<EOF
+histogram -d <directory>
+Options
+  -d, --directory     Specify directory containing feedback files
+EOF
+}
+
+while [[ $# > 0 && $1 == -* ]]; do
+  case $1 in
+    -d|--directory)
+      shift
+      SUBMISSION_DIRECTORY=$1
+      ;;
+    -h|--help)
+      usage
+      exit
+      ;;
+  esac
+
+  shift
+done
+
+
+# check for gnuplot
+if [[ -z "$(which gnuplot)" ]]; then
+  echo <<EOF
+  Please install gnuplot to generate histogram.
+
+  On Mac with Homebrew: brew install gnuplot --with-qt
+EOF
+  exit 1
+fi
+
+
+grep -r "Total points" $SUBMISSION_DIRECTORY/**/*_feedback.txt | \
+  awk '{print $3}' | \
+  gnuplot -p resources/histogram.gnuplot
