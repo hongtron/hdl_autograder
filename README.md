@@ -3,5 +3,22 @@
 ## Usage
 `bin/hdl_autograder --help`
 
-## Inspect results
-`grep -ri --include "*feedback.txt" output $SUBMISSIONS_DIRECTORY`
+## Grading steps
+1. Run autograder
+
+    ```
+    bin/hdl_autograder -p $PROJECT_NUMBER -a $CLASS_SUBMISSIONS_ARCHIVE
+    ```
+
+1. Find submissions needing manual review
+
+    ```
+    grep -ri --include "*feedback.txt" "review_needed" $GRADED_OUTPUT_DIRECTORY
+    ```
+
+1. Make any manual adjustments
+1. Generate histogram
+
+    ```
+    bin/histogram -d $GRADED_OUTPUT_DIRECTORY
+    ```
