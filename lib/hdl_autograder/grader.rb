@@ -102,7 +102,7 @@ module HdlAutograder
 
     def self.write_feedback(submission)
       feedback_file = File.join(submission.extracted_location, "#{submission.student_name}_feedback.txt")
-      File.open(feedback_file, 'w') { |f| f.write(submission.feedback) }
+      File.open(feedback_file, 'w') { |f| f.puts(submission.feedback) }
     end
   end
 end
