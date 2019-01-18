@@ -2,6 +2,13 @@ module HdlAutograder
   class Grader
     EXCEPTIONAL_IMPLEMENTATION_BONUS = 2
 
+    # key is a range describing possible quality points
+    # value is the amount of points to take off for each extraneous chip
+    QUALITY_GRADING_SCALE = {
+      (0..3) => 0.5,
+      (4..Float::INFINITY) => 1,
+    }
+
     def self.grade(submission)
       puts "Grading #{submission.student_name}..."
 
@@ -71,7 +78,8 @@ module HdlAutograder
         parts_used = implementation.number_of_parts_used(builtins)
         optimal_count = implementation.chip.optimal_part_count
         exceptional_count = implementation.chip.exceptional_part_count
-        quality_deductions = parts_used - optimal_count
+        _, scale = QUALITY_GRADING_SCALE.find { |range, _| range.include?(implementation.chip.quality_points) }
+        quality_deductions = ((parts_used - optimal_count) * scale).ceil
 
         if quality_deductions < 0
           if parts_used == exceptional_count
