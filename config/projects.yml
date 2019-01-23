@@ -71,7 +71,8 @@
         quality: 3
     -
       name: "DMux"
-      optimal_part_count: 2
+      optimal_part_count: 3
+      exceptional_part_count: 2
       points:
         functionality: 5
         quality: 3

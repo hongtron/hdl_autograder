@@ -1,6 +1,6 @@
 module HdlAutograder
   class Grader
-    EXCEPTIONAL_IMPLEMENTATION_BONUS = 2
+    EXCEPTIONAL_IMPLEMENTATION_BONUS = 1
 
     # key is a range describing possible quality points
     # value is the amount of points to take off for each extraneous chip
