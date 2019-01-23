@@ -76,26 +76,25 @@ module HdlAutograder
       else
         possible_points = implementation.chip.quality_points
         parts_used = implementation.number_of_parts_used(builtins)
-        optimal_count = implementation.chip.optimal_part_count
+        acceptable_part_counts = implementation.chip.acceptable_part_counts
+        grading_standard = acceptable_part_counts.max
         exceptional_count = implementation.chip.exceptional_part_count
         _, scale = QUALITY_GRADING_SCALE.find { |range, _| range.include?(implementation.chip.quality_points) }
-        quality_deductions = ((parts_used - optimal_count) * scale).ceil
 
-        if quality_deductions < 0
-          if parts_used == exceptional_count
-            implementation.award_quality_points(EXCEPTIONAL_IMPLEMENTATION_BONUS)
-            implementation.add_comment("nice work! +#{EXCEPTIONAL_IMPLEMENTATION_BONUS}")
-            quality_deductions = 0
-          else
-            raise "More optimal part count found for #{implementation.chip.name}"
-          end
+        if !acceptable_part_counts.include?(parts_used) && parts_used < grading_standard
+          raise "unknown solution for #{implementation.chip.name}"
         end
 
-        points_earned = [possible_points - quality_deductions, 0].max
-        implementation.award_quality_points(points_earned)
-
-        unless [optimal_count, exceptional_count].include?(parts_used)
-          implementation.add_comment("#{parts_used} parts used; #{optimal_count} is optimal")
+        if parts_used == exceptional_count
+          implementation.quality_points = EXCEPTIONAL_IMPLEMENTATION_BONUS + possible_points
+          implementation.add_comment("nice work! +#{EXCEPTIONAL_IMPLEMENTATION_BONUS}")
+        elsif acceptable_part_counts.include?(parts_used)
+          implementation.quality_points = possible_points
+        else
+          quality_deductions = ((parts_used - grading_standard) * scale).ceil
+          points_earned = [possible_points - quality_deductions, 0].max
+          implementation.quality_points = points_earned
+          implementation.add_comment("#{parts_used} parts used; #{grading_standard} or fewer is the target")
         end
       end
     end
