@@ -150,7 +150,7 @@
         quality: 5
     -
       name: "ALU"
-      acceptable_part_count: 13
+      acceptable_part_count: 15
       points:
         functionality: 35
         quality: 17
@@ -173,49 +173,49 @@
   chips:
     -
       name: "Bit"
-      acceptable_part_count: "unknown"
+      acceptable_part_count: 2
       points:
         functionality: 7
         quality: 3
     -
       name: "Register"
-      acceptable_part_count: "unknown"
+      acceptable_part_count: 16
       points:
         functionality: 7
         quality: 3
     -
       name: "RAM8"
-      acceptable_part_count: "unknown"
+      acceptable_part_count: 10
       points:
         functionality: 13
         quality: 6
     -
       name: "RAM64"
-      acceptable_part_count: "unknown"
+      acceptable_part_count: 10
       points:
         functionality: 13
         quality: 6
     -
       name: "RAM512"
-      acceptable_part_count: "unknown"
+      acceptable_part_count: 10
       points:
         functionality: 5
         quality: 3
     -
       name: "RAM4K"
-      acceptable_part_count: "unknown"
+      acceptable_part_count: 10
       points:
         functionality: 5
         quality: 3
     -
       name: "RAM16K"
-      acceptable_part_count: "unknown"
+      acceptable_part_count: 6
       points:
         functionality: 5
         quality: 3
     -
       name: "PC"
-      acceptable_part_count: "unknown"
+      acceptable_part_count: 5
       points:
         functionality: 12
         quality: 6
