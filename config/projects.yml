@@ -16,93 +16,93 @@
   chips:
     -
       name: "Not"
-      optimal_part_count: 1
+      acceptable_part_count: 1
       points:
         functionality: 3
         quality: 1
     -
       name: "And"
-      optimal_part_count: 2
+      acceptable_part_count: 2
       points:
         functionality: 3
         quality: 1
     -
       name: "Or"
-      optimal_part_count: 3
+      acceptable_part_count: 3
       points:
         functionality: 4
         quality: 2
     -
       name: "Xor"
-      optimal_part_count: 3
+      acceptable_part_count: 3
       points:
         functionality: 4
         quality: 2
     -
       name: "Not16"
-      optimal_part_count: 16
+      acceptable_part_count: 16
       points:
         functionality: 3
         quality: 2
     -
       name: "And16"
-      optimal_part_count: 16
+      acceptable_part_count: 16
       points:
         functionality: 3
         quality: 2
     -
       name: "Or16"
-      optimal_part_count: 16
+      acceptable_part_count: 16
       exceptional_part_count: 4
       points:
         functionality: 3
         quality: 2
     -
       name: "Or8Way"
-      optimal_part_count: 7
+      acceptable_part_count: 7
       points:
         functionality: 5
         quality: 3
     -
       name: "Mux"
-      optimal_part_count: 4
+      acceptable_part_count: 4
       points:
         functionality: 5
         quality: 3
     -
       name: "DMux"
-      optimal_part_count: 3
+      acceptable_part_count: 3
       exceptional_part_count: 2
       points:
         functionality: 5
         quality: 3
     -
       name: "Mux16"
-      optimal_part_count: 16
+      acceptable_part_count: 16
       points:
         functionality: 3
         quality: 2
     -
       name: "Mux4Way16"
-      optimal_part_count: 3
+      acceptable_part_count: 3
       points:
         functionality: 6
         quality: 3
     -
       name: "Mux8Way16"
-      optimal_part_count: 3
+      acceptable_part_count: 7
       points:
         functionality: 6
         quality: 3
     -
       name: "DMux4Way"
-      optimal_part_count: 3
+      acceptable_part_count: 3
       points:
         functionality: 6
         quality: 3
     -
       name: "DMux8Way"
-      optimal_part_count: 3
+      acceptable_part_count: 7
       points:
         functionality: 6
         quality: 3
@@ -126,31 +126,31 @@
   chips:
     -
       name: "HalfAdder"
-      optimal_part_count: 2
+      acceptable_part_count: 2
       points:
         functionality: 6
         quality: 3
     -
       name: "FullAdder"
-      optimal_part_count: 3
+      acceptable_part_count: 3
       points:
         functionality: 8
         quality: 4
     -
       name: "Add16"
-      optimal_part_count: 16
+      acceptable_part_count: 16
       points:
         functionality: 8
         quality: 4
     -
       name: "Inc16"
-      optimal_part_count: 1
+      acceptable_part_count: 1
       points:
         functionality: 10
         quality: 5
     -
       name: "ALU"
-      optimal_part_count: 13
+      acceptable_part_count: 13
       points:
         functionality: 35
         quality: 17
@@ -173,49 +173,49 @@
   chips:
     -
       name: "Bit"
-      optimal_part_count: "unknown"
+      acceptable_part_count: "unknown"
       points:
         functionality: 7
         quality: 3
     -
       name: "Register"
-      optimal_part_count: "unknown"
+      acceptable_part_count: "unknown"
       points:
         functionality: 7
         quality: 3
     -
       name: "RAM8"
-      optimal_part_count: "unknown"
+      acceptable_part_count: "unknown"
       points:
         functionality: 13
         quality: 6
     -
       name: "RAM64"
-      optimal_part_count: "unknown"
+      acceptable_part_count: "unknown"
       points:
         functionality: 13
         quality: 6
     -
       name: "RAM512"
-      optimal_part_count: "unknown"
+      acceptable_part_count: "unknown"
       points:
         functionality: 5
         quality: 3
     -
       name: "RAM4K"
-      optimal_part_count: "unknown"
+      acceptable_part_count: "unknown"
       points:
         functionality: 5
         quality: 3
     -
       name: "RAM16K"
-      optimal_part_count: "unknown"
+      acceptable_part_count: "unknown"
       points:
         functionality: 5
         quality: 3
     -
       name: "PC"
-      optimal_part_count: "unknown"
+      acceptable_part_count: "unknown"
       points:
         functionality: 12
         quality: 6
@@ -244,19 +244,19 @@
   chips:
     -
       name: "Memory"
-      optimal_part_count: 5
+      acceptable_part_count: 5
       points:
         functionality: 17
         quality: 8
     -
       name: "CPU"
-      optimal_part_count: 18
+      acceptable_part_count: 18
       points:
         functionality: 35
         quality: 18
     -
       name: "Computer"
-      optimal_part_count: 3
+      acceptable_part_count: 3
       points:
         functionality: 15
         quality: 7

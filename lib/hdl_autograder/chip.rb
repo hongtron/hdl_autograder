@@ -8,8 +8,8 @@ module HdlAutograder
       @config["name"]
     end
 
-    def optimal_part_count
-      @config["optimal_part_count"]
+    def acceptable_part_count
+      @config["acceptable_part_count"]
     end
 
     def exceptional_part_count

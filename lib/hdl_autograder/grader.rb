@@ -76,26 +76,22 @@ module HdlAutograder
       else
         possible_points = implementation.chip.quality_points
         parts_used = implementation.number_of_parts_used(builtins)
-        optimal_count = implementation.chip.optimal_part_count
+        acceptable_count = implementation.chip.acceptable_part_count
         exceptional_count = implementation.chip.exceptional_part_count
         _, scale = QUALITY_GRADING_SCALE.find { |range, _| range.include?(implementation.chip.quality_points) }
-        quality_deductions = ((parts_used - optimal_count) * scale).ceil
 
-        if quality_deductions < 0
-          if parts_used == exceptional_count
-            implementation.award_quality_points(EXCEPTIONAL_IMPLEMENTATION_BONUS)
-            implementation.add_comment("nice work! +#{EXCEPTIONAL_IMPLEMENTATION_BONUS}")
-            quality_deductions = 0
-          else
-            raise "More optimal part count found for #{implementation.chip.name}"
-          end
-        end
-
-        points_earned = [possible_points - quality_deductions, 0].max
-        implementation.award_quality_points(points_earned)
-
-        unless [optimal_count, exceptional_count].include?(parts_used)
-          implementation.add_comment("#{parts_used} parts used; #{optimal_count} is optimal")
+        if exceptional_count && parts_used < exceptional_count
+          raise "New exceptional implementation found for #{implementation.chip.name}"
+        elsif parts_used == exceptional_count
+          implementation.quality_points = EXCEPTIONAL_IMPLEMENTATION_BONUS + possible_points
+          implementation.add_comment("nice work! +#{EXCEPTIONAL_IMPLEMENTATION_BONUS}")
+        elsif parts_used <= acceptable_count
+          implementation.quality_points = possible_points
+        else
+          quality_deductions = ((parts_used - acceptable_count) * scale).ceil
+          points_earned = [possible_points - quality_deductions, 0].max
+          implementation.quality_points = points_earned
+          implementation.add_comment("#{parts_used} parts used; #{acceptable_count} or fewer is the target")
         end
       end
     end
