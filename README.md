@@ -22,3 +22,9 @@
     ```
     bin/histogram -d $GRADED_OUTPUT_DIRECTORY
     ```
+
+1. Zip up files and histogram
+
+    ```
+    find $GRADED_OUTPUT_DIRECTORY -iname "*feedback.txt" | xargs zip -Xj $OUTPUT_ZIP_FILE $HISTOGRAM_FILE
+    ```
