@@ -91,7 +91,7 @@ module HdlAutograder
           quality_deductions = ((parts_used - acceptable_count) * scale).ceil
           points_earned = [possible_points - quality_deductions, 0].max
           implementation.quality_points = points_earned
-          implementation.add_comment("#{parts_used} parts used; #{acceptable_count} or fewer is the target")
+          implementation.add_comment("#{parts_used} parts used; #{acceptable_count} #{acceptable_count > 1 ? "or fewer" : ""} is the target")
         end
       end
     end
