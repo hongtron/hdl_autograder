@@ -1,7 +1,7 @@
 require 'pry-byebug'
 require 'fileutils'
-require 'forwardable'
 require 'yaml'
+require 'hdl_autograder/comments'
 require 'hdl_autograder/config'
 require 'hdl_autograder/chip'
 require 'hdl_autograder/project'

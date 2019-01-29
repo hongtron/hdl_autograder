@@ -1,5 +1,6 @@
 module HdlAutograder
   class Grader
+    NO_README_PENALTY = 5
     EXCEPTIONAL_IMPLEMENTATION_BONUS = 1
 
     # key is a range describing possible quality points
@@ -27,6 +28,11 @@ module HdlAutograder
           results[i],
           submission.project.builtins
         )
+      end
+
+      unless submission.has_readme?
+        submission.packaging_deductions = NO_README_PENALTY
+        submission.add_comment("no README, -#{NO_README_PENALTY}")
       end
 
       write_feedback(submission)

@@ -1,10 +1,12 @@
 module HdlAutograder
   class Submission
-    attr_accessor :project
+    attr_accessor :project, :comments, :packaging_deductions
+    include Comments
 
     def initialize(project, source)
       @source = File.new(source)
       @project = project
+      @packaging_deductions = 0
     end
 
     def ext
@@ -53,9 +55,16 @@ module HdlAutograder
     end
 
     def hdl_files
-      source_dir = compressed? ? extracted_location : @source
-      Dir.glob(File.join(source_dir, "**/*.hdl"))
+      Dir.glob(File.join(_source_dir, "**/*.hdl"))
         .reject { |f| File.read(f).include?("BUILTIN") }
+    end
+
+    def has_readme?
+      Dir.glob(File.join(_source_dir, "**/{readme,README}.{txt,md,TXT,MD}")).any?
+    end
+
+    def _source_dir
+      compressed? ? extracted_location : @source
     end
 
     def implementations
@@ -66,10 +75,12 @@ module HdlAutograder
     end
 
     def total_points
-      [
+      implementation_points = [
       implementations.map(&:functionality_points).select { |x| x.instance_of?(Integer) },
       implementations.map(&:quality_points).select { |x| x.instance_of?(Integer) },
       ].flatten.reduce(:+)
+
+      implementation_points - packaging_deductions
     end
 
     def feedback
@@ -77,6 +88,7 @@ module HdlAutograder
         [] <<
         @project.feedback_template <<
         implementations.map(&:feedback) <<
+        comments <<
         "Total points: #{total_points}"
       ).join("\n")
     end
