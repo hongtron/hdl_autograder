@@ -245,14 +245,12 @@
     -
       name: "Memory"
       acceptable_part_count: 13
-      exceptional_part_count: 5
       points:
         functionality: 17
         quality: 8
     -
       name: "CPU"
       acceptable_part_count: 30
-      exceptional_part_count: 18
       points:
         functionality: 35
         quality: 18
