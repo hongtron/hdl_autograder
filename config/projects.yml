@@ -34,7 +34,7 @@
         quality: 2
     -
       name: "Xor"
-      acceptable_part_count: 3
+      acceptable_part_count: 5
       points:
         functionality: 4
         quality: 2
