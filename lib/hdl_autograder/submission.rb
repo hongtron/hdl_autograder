@@ -12,7 +12,7 @@ module HdlAutograder
     end
 
     def supported_ext?
-      [".zip", ".gz", ".tar"].include?(ext)
+      [".zip", ".gz", ".tar", ".rar"].include?(ext)
     end
 
     def compressed?
@@ -20,17 +20,17 @@ module HdlAutograder
     end
 
     def extract!
-      return unless compressed?
+      raise "unhandled ext: #{ext}" unless compressed?
 
       case ext
       when ".zip"
         %x[unzip "#{@source.path}" -d "#{extracted_location}"]
+      when ".rar"
+        %x[unar "#{@source.path}" -o "#{extracted_location}"]
       when ".gz"
         _untar(gzipped: true)
       when ".tar"
         _untar(gzipped: false)
-      else
-        raise "unhandled ext: #{ext}"
       end
     end
 
