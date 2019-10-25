@@ -2,7 +2,7 @@ module HdlAutograder
   class Submission
     attr_accessor :project
 
-    SUPPORTED_ARCHIVE_FILETYPES = [".zip", ".gz", ".tar", ".rar"]
+    SUPPORTED_ARCHIVE_FILETYPES = [".zip", ".gz", ".tar", ".rar", ".7z"]
     def initialize(project, source)
       @source = File.new(source)
       @project = project
@@ -32,6 +32,8 @@ module HdlAutograder
         _untar(gzipped: true)
       when ".tar"
         _untar(gzipped: false)
+      when ".7z"
+        %x[7z x "#{@source.path}" -o "#{extracted_location}"]
       end
     end
 
