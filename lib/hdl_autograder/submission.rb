@@ -33,7 +33,7 @@ module HdlAutograder
       when ".tar"
         _untar(gzipped: false)
       when ".7z"
-        %x[7z x "#{@source.path}" -o "#{extracted_location}"]
+        %x[7z x "#{@source.path}" -o"#{extracted_location}"]
       end
     end
 
