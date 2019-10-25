@@ -13,7 +13,7 @@ module HdlAutograder
     end
 
     def supported_ext?
-      raise "unhandled ext: #{ext}" unless SUPPORTED_ARCHIVE_FILETYPES.include?(ext)
+      SUPPORTED_ARCHIVE_FILETYPES.include?(ext) || (raise "unhandled ext: #{ext}")
     end
 
     def compressed?
