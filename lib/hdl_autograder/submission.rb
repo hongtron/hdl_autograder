@@ -2,6 +2,7 @@ module HdlAutograder
   class Submission
     attr_accessor :project
 
+    SUPPORTED_ARCHIVE_FILETYPES = [".zip", ".gz", ".tar", ".rar"]
     def initialize(project, source)
       @source = File.new(source)
       @project = project
@@ -12,7 +13,7 @@ module HdlAutograder
     end
 
     def supported_ext?
-      [".zip", ".gz", ".tar", ".rar"].include?(ext)
+      raise "unhandled ext: #{ext}" unless SUPPORTED_ARCHIVE_FILETYPES.include?(ext)
     end
 
     def compressed?
@@ -20,7 +21,7 @@ module HdlAutograder
     end
 
     def extract!
-      raise "unhandled ext: #{ext}" unless compressed?
+      return unless compressed?
 
       case ext
       when ".zip"
